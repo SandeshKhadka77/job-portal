@@ -29,7 +29,34 @@
 <section class="py-20 px-6 bg-white border-t">
     <div class="container">
         <h2 class="heading-2">Featured Jobs</h2>
-        <p class="text-center text-gray mt-6">Coming soon... Jobs will be displayed here.</p>
+        {% if featured_jobs %}
+            <div class="featured-jobs-list mt-10">
+                {% for job in featured_jobs %}
+                    <article class="job-card">
+                        <div class="job-header">
+                            <h3 class="job-title">{{ job.title }}</h3>
+                            <p class="job-company">{{ job.company_name }}</p>
+                        </div>
+
+                        <div class="job-meta">
+                            <span>{{ job.location }}</span>
+                            <span>{{ job.salary_display }}</span>
+                        </div>
+
+                        <div class="job-tags">
+                            <span class="tag tag-primary">{{ job.get_job_type_display }}</span>
+                            {% if job.is_remote %}
+                                <span class="tag">Remote</span>
+                            {% endif %}
+                        </div>
+
+                        <a href="#" class="btn btn-primary btn-sm">Apply Now</a>
+                    </article>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p class="text-center text-gray mt-6">No jobs posted yet. Add jobs from admin to see cards here.</p>
+        {% endif %}
     </div>
 </section>
 {% endblock %}

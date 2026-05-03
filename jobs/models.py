@@ -1,5 +1,4 @@
 from django.db import models
-from django.utils import timezone
 
 # models
 class Job(models.Model):
@@ -35,5 +34,9 @@ class Job(models.Model):
     # Custom method to display salary range
     def salary_display(self):
         if self.salary_min and self.salary_max:
-            return f"${self.salary_min:,} - ${self.salary_max:,}"
+            return f"NRs {self.salary_min:,} - NRs {self.salary_max:,}"
+        if self.salary_min:
+            return f"From NRs {self.salary_min:,}"
+        if self.salary_max:
+            return f"Up to NRs {self.salary_max:,}"
         return "Salary not specified"
