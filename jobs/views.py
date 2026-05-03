@@ -3,11 +3,13 @@ from django.db.models import Q
 from .models import Job
 
 
-# Create your views here.
+# added search and filter functionality to the home view. Users can search by keyword, location, job type, and remote status. If no search parameters are provided, it will show featured jobs or recent jobs as a fallback.
 
 def home(request):
     q = request.GET.get('q', '').strip()
     location = request.GET.get('location', '').strip()
+    job_type = request.GET.get('job_type', '').strip()
+    remote = request.GET.get('remote', '').strip()
 
     # If no search provided, show featured jobs (fallback to recent)
     if not q and not location:
@@ -23,11 +25,17 @@ def home(request):
             )
         if location:
             qs = qs.filter(location__icontains=location)
+        if job_type:
+            qs = qs.filter(job_type=job_type)
+        if remote.lower() in ('1', 'true', 'yes', 'on'):
+            qs = qs.filter(is_remote=True)
         jobs = qs.order_by('-created_at')[:12]
 
     return render(request, 'home.html', {
         'featured_jobs': jobs,
         'q': q,
         'location': location,
+        'job_type': job_type,
+        'remote': remote,
     })
 
