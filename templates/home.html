@@ -17,11 +17,11 @@
         </p>
         
         <!-- Search Bar -->
-        <div class="search-bar">
-            <input type="text" placeholder="Job title or keyword" class="form-input">
-            <input type="text" placeholder="Location" class="form-input">
-            <button class="btn btn-primary">Search</button>
-        </div>
+        <form method="get" class="search-bar" role="search">
+            <input type="text" name="q" placeholder="Job title or keyword" class="form-input" value="{{ q }}">
+            <input type="text" name="location" placeholder="Location (e.g., Kathmandu)" class="form-input" value="{{ location }}">
+            <button type="submit" class="btn btn-primary">Search</button>
+        </form>
     </div>
 </div>
 
@@ -30,6 +30,9 @@
     <div class="container">
         <h2 class="heading-2">Featured Jobs</h2>
         {% if featured_jobs %}
+            {% if q or location %}
+                <p class="text-center text-gray mt-6">Showing {{ featured_jobs|length }} results</p>
+            {% endif %}
             <div class="featured-jobs-list mt-10">
                 {% for job in featured_jobs %}
                     <article class="job-card">
