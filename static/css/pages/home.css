@@ -50,12 +50,28 @@
 
 /* Featured Jobs */
 .featured-jobs-list {
-    max-width: 56rem;
+    max-width: 72rem;
     margin-left: auto;
     margin-right: auto;
-    display: flex;
-    flex-direction: column;
-    gap: 1.25rem;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+}
+
+.featured-jobs-list .job-card {
+    height: 100%;
+}
+
+@media (min-width: 768px) {
+    .featured-jobs-list {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (min-width: 1024px) {
+    .featured-jobs-list {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
 }
 
 @media (max-width: 768px) {
