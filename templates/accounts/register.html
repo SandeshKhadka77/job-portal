@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Register - Job Portal{% endblock %}
+
+{% block page_css %}
+    <link rel="stylesheet" href="{% static 'css/pages/accounts.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="auth-card">
+        <h1 class="auth-heading">Create Account</h1>
+        <p class="auth-subtext">Join thousands of job seekers</p>
+        
+        <form method="POST" class="form-container">
+            {% csrf_token %}
+            
+            <div class="form-group">
+                <label class="form-label">Full Name</label>
+                <input type="text" name="full_name" required class="form-input" placeholder="sandesh">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Email</label>
+                <input type="email" name="email" required class="form-input" placeholder="your@gmail.com">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Password</label>
+                <input type="password" name="password" required class="form-input" placeholder="••••••••">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Confirm Password</label>
+                <input type="password" name="password_confirm" required class="form-input" placeholder="••••••••">
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-block">Create Account</button>
+        </form>
+
+        <div class="auth-footer">
+            Already have an account? <a href="{% url 'login' %}">Sign in</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

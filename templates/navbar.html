@@ -1,0 +1,29 @@
+{% load static %}
+<nav class="navbar">
+    <div class="navbar-container">
+        <!-- Logo -->
+        <a href="{% url 'home' %}" class="navbar-logo">
+            Job<span class="navbar-logo-text">Portal</span>
+        </a>
+
+        <!-- Navigation Links -->
+        <ul class="navbar-links">
+            <li><a href="{% url 'home' %}" class="navbar-link">Jobs</a></li>
+            <li><a href="#" class="navbar-link">Companies</a></li>
+            <li><a href="#" class="navbar-link">About</a></li>
+        </ul>
+
+        <!-- Auth Buttons -->
+        <div class="navbar-actions">
+            <a href="{% url 'login' %}" class="btn-link">Login</a>
+            <a href="{% url 'register' %}" class="btn btn-primary">Register</a>
+        </div>
+
+        <!-- Mobile Menu Toggle -->
+        <button class="navbar-toggle">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+            </svg>
+        </button>
+    </div>
+</nav>

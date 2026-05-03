@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Home - Job Portal{% endblock %}
+
+{% block page_css %}
+    <link rel="stylesheet" href="{% static 'css/pages/home.css' %}">
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<div class="hero-section">
+    <div class="hero-content">
+        <h1 class="hero-title">Find Your Dream Job Today</h1>
+        <p class="hero-subtitle">
+            Discover thousands of job opportunities with all the information you need. It's your future, make it now.
+        </p>
+        
+        <!-- Search Bar -->
+        <div class="search-bar">
+            <input type="text" placeholder="Job title or keyword" class="form-input">
+            <input type="text" placeholder="Location" class="form-input">
+            <button class="btn btn-primary">Search</button>
+        </div>
+    </div>
+</div>
+
+<!-- Featured Jobs Section -->
+<section class="py-20 px-6 bg-white border-t">
+    <div class="container">
+        <h2 class="heading-2">Featured Jobs</h2>
+        <p class="text-center text-gray mt-6">Coming soon... Jobs will be displayed here.</p>
+    </div>
+</section>
+{% endblock %}
