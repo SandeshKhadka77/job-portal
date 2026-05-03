@@ -22,13 +22,13 @@
             <input type="text" name="location" placeholder="Location (e.g., Kathmandu)" class="form-input" value="{{ location }}">
             <select name="job_type" class="form-input" aria-label="Job type">
                 <option value="" {% if not job_type %}selected{% endif %}>All types</option>
-                <option value="full-time" {% if job_type=='full-time' %}selected{% endif %}>Full-time</option>
-                <option value="part-time" {% if job_type=='part-time' %}selected{% endif %}>Part-time</option>
-                <option value="contract" {% if job_type=='contract' %}selected{% endif %}>Contract</option>
-                <option value="internship" {% if job_type=='internship' %}selected{% endif %}>Internship</option>
+                <option value="full-time" {% if job_type == 'full-time' %}selected{% endif %}>Full-time</option>
+                <option value="part-time" {% if job_type == 'part-time' %}selected{% endif %}>Part-time</option>
+                <option value="contract" {% if job_type == 'contract' %}selected{% endif %}>Contract</option>
+                <option value="internship" {% if job_type == 'internship' %}selected{% endif %}>Internship</option>
             </select>
             <label class="form-input" style="display:flex;align-items:center;gap:0.5rem;">
-                <input type="checkbox" name="remote" value="1" {% if remote in ('1','true','on','yes') %}checked{% endif %}>
+                <input type="checkbox" name="remote" value="1" {% if remote == '1' or remote == 'true' or remote == 'on' or remote == 'yes' %}checked{% endif %}>
                 Remote
             </label>
             <button type="submit" class="btn btn-primary">Search</button>
