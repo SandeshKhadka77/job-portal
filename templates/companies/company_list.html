@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Companies - Job Portal{% endblock %}
+
+{% block page_css %}
+    <link rel="stylesheet" href="{% static 'css/pages/companies.css' %}">
+{% endblock %}
+
+{% block content %}
+<section class="companies-page">
+    <div class="container">
+        <div class="page-heading">
+            <h1 class="heading-2">Companies </h1>
+            <p class="text-gray">Browse hiring companies and open roles.</p>
+        </div>
+
+        {% if companies %}
+            <div class="companies-grid">
+                {% for company in companies %}
+                    <article class="company-card">
+                        <div>
+                            <p class="company-meta">{{ company.location }}</p>
+                            <h2 class="company-name">{{ company.name }}</h2>
+                            {% if company.tagline %}
+                                <p class="company-tagline">{{ company.tagline }}</p>
+                            {% endif %}
+                        </div>
+                        <div class="company-footer">
+                            <span>{{ company.job_count }} open role{{ company.job_count|pluralize }}</span>
+                            <a href="{% url 'company_detail' company.pk %}">View company</a>
+                        </div>
+                    </article>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p class="text-center text-gray mt-6">No companies added yet. Add them from the admin panel.</p>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

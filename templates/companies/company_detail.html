@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ company.name }} - Job Portal{% endblock %}
+
+{% block page_css %}
+    <link rel="stylesheet" href="{% static 'css/pages/companies.css' %}">
+{% endblock %}
+
+{% block content %}
+<section class="companies-page">
+    <div class="container company-detail-layout">
+        <a href="{% url 'company_list' %}" class="back-link">&larr; Back to companies</a>
+
+        <article class="company-profile-card">
+            <p class="company-meta">{{ company.location }}</p>
+            <h1 class="company-name company-name-large">{{ company.name }}</h1>
+            {% if company.tagline %}
+                <p class="company-tagline">{{ company.tagline }}</p>
+            {% endif %}
+
+            <div class="company-facts">
+                {% if company.size %}
+                    <span class="tag">{{ company.size }}</span>
+                {% endif %}
+                {% if company.founded_year %}
+                    <span class="tag">Founded {{ company.founded_year }}</span>
+                {% endif %}
+                {% if company.website %}
+                    <a href="{{ company.website }}" class="tag tag-primary" target="_blank" rel="noopener noreferrer">Website</a>
+                {% endif %}
+            </div>
+
+            <div class="company-description">
+                <h2>About the company</h2>
+                <p>{{ company.description }}</p>
+            </div>
+        </article>
+
+        <aside class="company-jobs-card">
+            <h2>Open roles</h2>
+            {% if jobs %}
+                <div class="company-jobs-list">
+                    {% for job in jobs %}
+                        <article class="company-job-item">
+                            <h3>{{ job.title }}</h3>
+                            <p>{{ job.location }} · {{ job.salary_display }}</p>
+                            <a href="{% url 'job_detail' job.pk %}">View job</a>
+                        </article>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="text-gray">No open roles available right now.</p>
+            {% endif %}
+        </aside>
+    </div>
+</section>
+{% endblock %}
