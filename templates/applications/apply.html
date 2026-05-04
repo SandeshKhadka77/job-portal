@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Apply for {{ job.title }} - Job Portal{% endblock %}
+
+{% block page_css %}
+    <link rel="stylesheet" href="{% static 'css/pages/apply.css' %}">
+{% endblock %}
+
+{% block content %}
+<section class="apply-page">
+    <div class="container apply-layout">
+        <div class="apply-card">
+            <a href="{% url 'job_detail' job.pk %}" class="back-link">&larr; Back to job details</a>
+            <h1 class="apply-title">Apply for {{ job.title }}</h1>
+            <p class="apply-company">{{ job.company_name }} · {{ job.location }}</p>
+
+            {% if messages %}
+                <div class="apply-messages">
+                    {% for message in messages %}
+                        <div class="message message-{{ message.tags }}">{{ message }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            <form method="post" class="apply-form">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label class="form-label" for="full_name">Full name</label>
+                    <input class="form-input" type="text" id="full_name" name="full_name" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="email">Email</label>
+                    <input class="form-input" type="email" id="email" name="email" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="phone">Phone</label>
+                    <input class="form-input" type="text" id="phone" name="phone">
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="cover_letter">Cover letter</label>
+                    <textarea class="form-textarea" id="cover_letter" name="cover_letter" rows="8" required></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">Submit Application</button>
+            </form>
+        </div>
+
+        <aside class="apply-summary">
+            <h2 class="heading-3">Job summary</h2>
+            <p><strong>Location:</strong> {{ job.location }}</p>
+            <p><strong>Salary:</strong> {{ job.salary_display }}</p>
+            <p><strong>Type:</strong> {{ job.get_job_type_display }}</p>
+            {% if job.is_remote %}
+                <p><strong>Remote:</strong> Yes</p>
+            {% endif %}
+        </aside>
+    </div>
+</section>
+{% endblock %}

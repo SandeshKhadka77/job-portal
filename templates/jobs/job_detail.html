@@ -12,6 +12,14 @@
     <div class="container job-detail-layout">
         <a href="{% url 'home' %}" class="back-link">&larr; Back to jobs</a>
 
+        {% if messages %}
+            <div class="job-detail-messages">
+                {% for message in messages %}
+                    <div class="message message-{{ message.tags }}">{{ message }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
         <article class="job-detail-card">
             <div class="job-detail-header">
                 <div>
@@ -50,7 +58,7 @@
             </div>
 
             <div class="job-detail-actions">
-                <a href="#" class="btn btn-primary">Apply Now</a>
+                <a href="{% url 'apply_job' job.pk %}" class="btn btn-primary">Apply Now</a>
                 <a href="{% url 'home' %}" class="btn btn-link-primary">See more jobs</a>
             </div>
         </article>

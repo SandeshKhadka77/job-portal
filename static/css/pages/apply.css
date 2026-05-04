@@ -1,0 +1,91 @@
+.apply-page {
+    padding: 4rem 1.5rem 5rem;
+    background: linear-gradient(180deg, var(--bg-light) 0%, #ffffff 100%);
+}
+
+.apply-layout {
+    max-width: 72rem;
+    margin: 0 auto;
+    display: grid;
+    gap: 2rem;
+}
+
+.apply-card,
+.apply-summary {
+    background: var(--bg-white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-sm);
+}
+
+.apply-card {
+    padding: 2rem;
+}
+
+.back-link {
+    color: var(--primary);
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.back-link:hover {
+    text-decoration: underline;
+}
+
+.apply-title {
+    margin-top: 1rem;
+    font-size: 2rem;
+    color: var(--text-dark);
+}
+
+.apply-company {
+    margin-top: 0.5rem;
+    color: var(--text-gray);
+}
+
+.apply-messages {
+    margin: 1.5rem 0;
+    display: grid;
+    gap: 0.75rem;
+}
+
+.message {
+    padding: 0.9rem 1rem;
+    border-radius: var(--radius-lg);
+    font-weight: 500;
+}
+
+.message-error {
+    background: #fef2f2;
+    color: #b91c1c;
+    border: 1px solid #fecaca;
+}
+
+.message-success {
+    background: #ecfdf5;
+    color: #047857;
+    border: 1px solid #a7f3d0;
+}
+
+.apply-form {
+    margin-top: 1.5rem;
+    display: grid;
+    gap: 1rem;
+}
+
+.apply-summary {
+    padding: 1.5rem;
+}
+
+.apply-summary p {
+    color: var(--text-gray);
+    line-height: 1.7;
+    margin-top: 0.5rem;
+}
+
+@media (min-width: 1024px) {
+    .apply-layout {
+        grid-template-columns: minmax(0, 2fr) minmax(18rem, 1fr);
+        align-items: start;
+    }
+}
