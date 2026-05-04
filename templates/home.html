@@ -41,8 +41,8 @@
     <div class="container">
         <h2 class="heading-2">Featured Jobs</h2>
         {% if featured_jobs %}
-            {% if q or location %}
-                <p class="text-center text-gray mt-6">Showing {{ featured_jobs|length }} results</p>
+            {% if q or location or job_type or remote %}
+                <p class="text-center text-gray mt-6">Showing {{ page_obj.paginator.count }} results</p>
             {% endif %}
             <div class="featured-jobs-list mt-10">
                 {% for job in featured_jobs %}
@@ -68,6 +68,20 @@
                     </article>
                 {% endfor %}
             </div>
+
+            {% if page_obj.has_other_pages %}
+                <nav class="pagination" aria-label="Job list pagination">
+                    {% if page_obj.has_previous %}
+                        <a class="pagination-link" href="?{% if query_params %}{{ query_params }}&{% endif %}page={{ page_obj.previous_page_number }}">Previous</a>
+                    {% endif %}
+
+                    <span class="pagination-status">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+
+                    {% if page_obj.has_next %}
+                        <a class="pagination-link" href="?{% if query_params %}{{ query_params }}&{% endif %}page={{ page_obj.next_page_number }}">Next</a>
+                    {% endif %}
+                </nav>
+            {% endif %}
         {% else %}
             <p class="text-center text-gray mt-6">No jobs posted yet. Add jobs from admin to see cards here.</p>
         {% endif %}

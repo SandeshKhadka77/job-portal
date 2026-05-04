@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from django.db.models import Q
+from django.core.paginator import Paginator
 from .models import Job
 
 
@@ -10,12 +11,12 @@ def home(request):
     location = request.GET.get('location', '').strip()
     job_type = request.GET.get('job_type', '').strip()
     remote = request.GET.get('remote', '').strip()
+    page_number = request.GET.get('page', 1)
 
-    # If no search provided, show featured jobs (fallback to recent)
-    if not q and not location:
-        featured = Job.objects.filter(is_featured=True)
-        jobs = featured[:6] if featured.exists() else Job.objects.all()[:6]
-    else:
+    # Default to all jobs, with featured roles shown first.
+    jobs = Job.objects.all().order_by('-is_featured', '-created_at')
+
+    if q or location or job_type or remote:
         qs = Job.objects.all()
         if q:
             qs = qs.filter(
@@ -29,13 +30,21 @@ def home(request):
             qs = qs.filter(job_type=job_type)
         if remote.lower() in ('1', 'true', 'yes', 'on'):
             qs = qs.filter(is_remote=True)
-        jobs = qs.order_by('-created_at')[:12]
+        jobs = qs.order_by('-is_featured', '-created_at')
+
+    paginator = Paginator(jobs, 6)
+    page_obj = paginator.get_page(page_number)
+
+    query_params = request.GET.copy()
+    query_params.pop('page', None)
 
     return render(request, 'home.html', {
-        'featured_jobs': jobs,
+        'featured_jobs': page_obj.object_list,
+        'page_obj': page_obj,
         'q': q,
         'location': location,
         'job_type': job_type,
         'remote': remote,
+        'query_params': query_params.urlencode(),
     })
 
