@@ -1,6 +1,8 @@
 from django.shortcuts import render, get_object_or_404
 from django.db.models import Q
 from django.core.paginator import Paginator
+from django.contrib import messages
+from django.shortcuts import redirect
 from .models import Job
 
 
@@ -48,9 +50,10 @@ def home(request):
         'query_params': query_params.urlencode(),
     })
 
-
+# added job_detail view to display the details of a specific job. 
 def job_detail(request, pk):
     job = get_object_or_404(Job, pk=pk)
+    saved_job_ids = request.session.get('saved_job_ids', [])
     related_jobs = (
         Job.objects.exclude(pk=job.pk)
         .filter(location__icontains=job.location.split(',')[0])
@@ -60,5 +63,33 @@ def job_detail(request, pk):
     return render(request, 'jobs/job_detail.html', {
         'job': job,
         'related_jobs': related_jobs,
+        'is_saved': job.pk in saved_job_ids,
     })
+
+# added toggle_saved_job view to allow users to save or unsave jobs. 
+def toggle_saved_job(request, pk):
+    job = get_object_or_404(Job, pk=pk)
+    saved_job_ids = request.session.get('saved_job_ids', [])
+
+    if pk in saved_job_ids:
+        saved_job_ids.remove(pk)
+        messages.success(request, f'Removed {job.title} from saved jobs.')
+    else:
+        saved_job_ids.append(pk)
+        messages.success(request, f'Saved {job.title} for later.')
+
+    request.session['saved_job_ids'] = saved_job_ids
+    request.session.modified = True
+    referer = request.META.get('HTTP_REFERER')
+    if referer:
+        return redirect(referer)
+    return redirect('job_detail', pk=pk)
+
+
+def saved_jobs(request):
+    saved_job_ids = request.session.get('saved_job_ids', [])
+    saved_job_map = {job.pk: job for job in Job.objects.filter(pk__in=saved_job_ids)}
+    saved_job_list = [saved_job_map[job_id] for job_id in saved_job_ids if job_id in saved_job_map]
+
+    return render(request, 'jobs/saved_jobs.html', {'saved_jobs': saved_job_list})
 

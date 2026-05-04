@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Saved Jobs - Job Portal{% endblock %}
+
+{% block page_css %}
+    <link rel="stylesheet" href="{% static 'css/pages/saved.css' %}">
+{% endblock %}
+
+{% block content %}
+<section class="saved-jobs-page">
+    <div class="container">
+        <div class="page-heading">
+            <h1 class="heading-2">Saved Jobs</h1>
+            <p class="text-gray">Jobs you saved for later review.</p>
+        </div>
+
+        {% if saved_jobs %}
+            <div class="saved-jobs-list">
+                {% for job in saved_jobs %}
+                    <article class="job-card">
+                        <div class="job-header">
+                            <h3 class="job-title">{{ job.title }}</h3>
+                            <p class="job-company">{{ job.company_name }}</p>
+                        </div>
+
+                        <div class="job-meta">
+                            <span>{{ job.location }}</span>
+                            <span>{{ job.salary_display }}</span>
+                        </div>
+
+                        <div class="job-tags">
+                            <span class="tag tag-primary">{{ job.get_job_type_display }}</span>
+                            {% if job.is_remote %}
+                                <span class="tag">Remote</span>
+                            {% endif %}
+                        </div>
+
+                        <div class="saved-jobs-actions">
+                            <a href="{% url 'job_detail' job.pk %}" class="btn btn-primary btn-sm">View Details</a>
+                            <form method="post" action="{% url 'toggle_saved_job' job.pk %}">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-link-primary btn-sm">Remove</button>
+                            </form>
+                        </div>
+                    </article>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="empty-state">
+                <h2>You have no saved jobs yet.</h2>
+                <p>Open a job detail page and save roles you want to revisit.</p>
+                <a href="{% url 'home' %}" class="btn btn-primary">Browse jobs</a>
+            </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

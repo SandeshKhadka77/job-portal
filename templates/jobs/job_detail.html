@@ -59,6 +59,10 @@
 
             <div class="job-detail-actions">
                 <a href="{% url 'apply_job' job.pk %}" class="btn btn-primary">Apply Now</a>
+                <form method="post" action="{% url 'toggle_saved_job' job.pk %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-link-primary">{% if is_saved %}Remove from Saved{% else %}Save Job{% endif %}</button>
+                </form>
                 <a href="{% url 'home' %}" class="btn btn-link-primary">See more jobs</a>
             </div>
         </article>
