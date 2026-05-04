@@ -64,7 +64,7 @@
                             {% endif %}
                         </div>
 
-                        <a href="#" class="btn btn-primary btn-sm">Apply Now</a>
+                        <a href="{% url 'job_detail' job.pk %}" class="btn btn-primary btn-sm">View Details</a>
                     </article>
                 {% endfor %}
             </div>

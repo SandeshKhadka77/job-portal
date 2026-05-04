@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ job.title }} at {{ job.company_name }} - Job Portal{% endblock %}
+
+{% block page_css %}
+    <link rel="stylesheet" href="{% static 'css/pages/job-detail.css' %}">
+{% endblock %}
+
+{% block content %}
+<section class="job-detail-page">
+    <div class="container job-detail-layout">
+        <a href="{% url 'home' %}" class="back-link">&larr; Back to jobs</a>
+
+        <article class="job-detail-card">
+            <div class="job-detail-header">
+                <div>
+                    <p class="job-detail-company">{{ job.company_name }}</p>
+                    <h1 class="job-detail-title">{{ job.title }}</h1>
+                </div>
+                <div class="job-detail-badges">
+                    <span class="tag tag-primary">{{ job.get_job_type_display }}</span>
+                    {% if job.is_remote %}
+                        <span class="tag">Remote</span>
+                    {% endif %}
+                    {% if job.is_featured %}
+                        <span class="tag">Featured</span>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="job-detail-meta">
+                <div>
+                    <span class="meta-label">Location</span>
+                    <p>{{ job.location }}</p>
+                </div>
+                <div>
+                    <span class="meta-label">Salary</span>
+                    <p>{{ job.salary_display }}</p>
+                </div>
+                <div>
+                    <span class="meta-label">Posted</span>
+                    <p>{{ job.created_at|date:"M d, Y" }}</p>
+                </div>
+            </div>
+
+            <div class="job-detail-description">
+                <h2>Job Description</h2>
+                <p>{{ job.description }}</p>
+            </div>
+
+            <div class="job-detail-actions">
+                <a href="#" class="btn btn-primary">Apply Now</a>
+                <a href="{% url 'home' %}" class="btn btn-link-primary">See more jobs</a>
+            </div>
+        </article>
+
+        {% if related_jobs %}
+            <aside class="related-jobs">
+                <h2 class="heading-3">Related Jobs</h2>
+                <div class="related-jobs-list">
+                    {% for related_job in related_jobs %}
+                        <article class="related-job-card">
+                            <p class="related-job-company">{{ related_job.company_name }}</p>
+                            <h3 class="related-job-title">{{ related_job.title }}</h3>
+                            <p class="related-job-meta">{{ related_job.location }} · {{ related_job.salary_display }}</p>
+                            <a href="{% url 'job_detail' related_job.pk %}">View details</a>
+                        </article>
+                    {% endfor %}
+                </div>
+            </aside>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.db.models import Q
 from django.core.paginator import Paginator
 from .models import Job
@@ -46,5 +46,19 @@ def home(request):
         'job_type': job_type,
         'remote': remote,
         'query_params': query_params.urlencode(),
+    })
+
+
+def job_detail(request, pk):
+    job = get_object_or_404(Job, pk=pk)
+    related_jobs = (
+        Job.objects.exclude(pk=job.pk)
+        .filter(location__icontains=job.location.split(',')[0])
+        .order_by('-is_featured', '-created_at')[:3]
+    )
+
+    return render(request, 'jobs/job_detail.html', {
+        'job': job,
+        'related_jobs': related_jobs,
     })
 
