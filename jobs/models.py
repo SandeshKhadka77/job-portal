@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth.models import User
 
 # models
 class Job(models.Model):
@@ -40,3 +41,20 @@ class Job(models.Model):
         if self.salary_max:
             return f"Up to NRs {self.salary_max:,}"
         return "Salary not specified"
+
+
+class UserSavedJob(models.Model):
+    """Track which jobs are saved by which users for persistent storage."""
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='saved_jobs')
+    job = models.ForeignKey(Job, on_delete=models.CASCADE, related_name='saved_by_users')
+    saved_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('user', 'job')  # Prevent duplicate saves
+        ordering = ['-saved_at']
+        verbose_name = 'User Saved Job'
+        verbose_name_plural = 'User Saved Jobs'
+
+    def __str__(self):
+        return f"{self.user.username} saved {self.job.title}"
+

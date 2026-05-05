@@ -3,7 +3,7 @@ from django.db.models import Q
 from django.core.paginator import Paginator
 from django.contrib import messages
 from django.shortcuts import redirect
-from .models import Job
+from .models import Job, UserSavedJob
 
 
 # added search and filter functionality to the home view. Users can search by keyword, location, job type, and remote status. If no search parameters are provided, it will show featured jobs or recent jobs as a fallback.
@@ -53,7 +53,15 @@ def home(request):
 # added job_detail view to display the details of a specific job. 
 def job_detail(request, pk):
     job = get_object_or_404(Job, pk=pk)
-    saved_job_ids = request.session.get('saved_job_ids', [])
+    
+    # Check if job is saved (for authenticated users: database, for anonymous: session)
+    is_saved = False
+    if request.user.is_authenticated:
+        is_saved = UserSavedJob.objects.filter(user=request.user, job=job).exists()
+    else:
+        saved_job_ids = request.session.get('saved_job_ids', [])
+        is_saved = job.pk in saved_job_ids
+    
     related_jobs = (
         Job.objects.exclude(pk=job.pk)
         .filter(location__icontains=job.location.split(',')[0])
@@ -63,23 +71,38 @@ def job_detail(request, pk):
     return render(request, 'jobs/job_detail.html', {
         'job': job,
         'related_jobs': related_jobs,
-        'is_saved': job.pk in saved_job_ids,
+        'is_saved': is_saved,
     })
 
 # added toggle_saved_job view to allow users to save or unsave jobs. 
 def toggle_saved_job(request, pk):
     job = get_object_or_404(Job, pk=pk)
-    saved_job_ids = request.session.get('saved_job_ids', [])
-
-    if pk in saved_job_ids:
-        saved_job_ids.remove(pk)
-        messages.success(request, f'Removed {job.title} from saved jobs.')
+    
+    if request.user.is_authenticated:
+        # For authenticated users: use UserSavedJob model
+        saved_job, created = UserSavedJob.objects.get_or_create(user=request.user, job=job)
+        
+        if not created:
+            # Job was already saved, so remove it
+            saved_job.delete()
+            messages.success(request, f'Removed {job.title} from saved jobs.')
+        else:
+            # Job was just saved
+            messages.success(request, f'Saved {job.title} for later.')
     else:
-        saved_job_ids.append(pk)
-        messages.success(request, f'Saved {job.title} for later.')
-
-    request.session['saved_job_ids'] = saved_job_ids
-    request.session.modified = True
+        # For anonymous users: use session
+        saved_job_ids = request.session.get('saved_job_ids', [])
+        
+        if pk in saved_job_ids:
+            saved_job_ids.remove(pk)
+            messages.success(request, f'Removed {job.title} from saved jobs.')
+        else:
+            saved_job_ids.append(pk)
+            messages.success(request, f'Saved {job.title} for later.')
+        
+        request.session['saved_job_ids'] = saved_job_ids
+        request.session.modified = True
+    
     referer = request.META.get('HTTP_REFERER')
     if referer:
         return redirect(referer)
@@ -87,9 +110,15 @@ def toggle_saved_job(request, pk):
 
 
 def saved_jobs(request):
-    saved_job_ids = request.session.get('saved_job_ids', [])
-    saved_job_map = {job.pk: job for job in Job.objects.filter(pk__in=saved_job_ids)}
-    saved_job_list = [saved_job_map[job_id] for job_id in saved_job_ids if job_id in saved_job_map]
+    if request.user.is_authenticated:
+        # For authenticated users: get from UserSavedJob model
+        saved_jobs_objs = UserSavedJob.objects.filter(user=request.user).order_by('-saved_at')
+        saved_job_list = [obj.job for obj in saved_jobs_objs]
+    else:
+        # For anonymous users: get from session
+        saved_job_ids = request.session.get('saved_job_ids', [])
+        saved_job_map = {job.pk: job for job in Job.objects.filter(pk__in=saved_job_ids)}
+        saved_job_list = [saved_job_map[job_id] for job_id in saved_job_ids if job_id in saved_job_map]
 
     return render(request, 'jobs/saved_jobs.html', {'saved_jobs': saved_job_list})
 
