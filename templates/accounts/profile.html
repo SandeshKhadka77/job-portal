@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}My Profile - Job Portal{% endblock %}
+
+{% block page_css %}
+    <link rel="stylesheet" href="{% static 'css/pages/profile.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="profile-page">
+    <div class="profile-container">
+        <!-- Header -->
+        <div class="profile-header">
+            <div class="profile-info">
+                <h1>{{ user.first_name|default:user.email }}</h1>
+                <p class="profile-email">{{ user.email }}</p>
+            </div>
+            <form method="POST" action="{% url 'logout' %}" class="profile-actions">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-secondary">Logout</button>
+            </form>
+        </div>
+
+        <!-- Stats -->
+        <div class="profile-stats">
+            <div class="stat-card">
+                <div class="stat-value">{{ saved_jobs_count }}</div>
+                <div class="stat-label">Saved Jobs</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">{{ applications_count }}</div>
+                <div class="stat-label">Applications</div>
+            </div>
+        </div>
+
+        <!-- Recent Saved Jobs -->
+        <div class="profile-section">
+            <h2>Recent Saved Jobs</h2>
+            {% if recent_saved_jobs %}
+                <div class="saved-jobs-list">
+                    {% for saved_job in recent_saved_jobs %}
+                        <article class="job-card">
+                            <div class="job-card-header">
+                                <h3>{{ saved_job.job.title }}</h3>
+                                <p class="job-company">{{ saved_job.job.company_name }}</p>
+                            </div>
+                            <div class="job-card-meta">
+                                <span class="job-location"> {{ saved_job.job.location }}</span>
+                                <span class="job-salary"> {{ saved_job.job.salary_display }}</span>
+                            </div>
+                            <div class="job-card-badges">
+                                <span class="badge">{{ saved_job.job.get_job_type_display }}</span>
+                                {% if saved_job.job.is_remote %}
+                                    <span class="badge badge-remote">Remote</span>
+                                {% endif %}
+                            </div>
+                            <div class="job-card-actions">
+                                <a href="{% url 'job_detail' saved_job.job.pk %}" class="btn btn-sm">View Details</a>
+                            </div>
+                        </article>
+                    {% endfor %}
+                </div>
+                <div class="view-all-link">
+                    <a href="{% url 'saved_jobs' %}">View all saved jobs →</a>
+                </div>
+            {% else %}
+                <p class="empty-state">You haven't saved any jobs yet. <a href="{% url 'home' %}">Browse jobs</a></p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

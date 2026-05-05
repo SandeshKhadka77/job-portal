@@ -16,8 +16,20 @@
 
         <!-- Auth Buttons -->
         <div class="navbar-actions">
-            <a href="{% url 'login' %}" class="btn-link">Login</a>
-            <a href="{% url 'register' %}" class="btn btn-primary">Register</a>
+            {% if user.is_authenticated %}
+                <div class="navbar-user">
+                    <a href="{% url 'profile' %}" class="btn-link">
+                        {{ user.first_name|default:user.email }}
+                    </a>
+                </div>
+                <form method="POST" action="{% url 'logout' %}" style="display: inline;">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-secondary">Logout</button>
+                </form>
+            {% else %}
+                <a href="{% url 'login' %}" class="btn-link">Login</a>
+                <a href="{% url 'register' %}" class="btn btn-primary">Register</a>
+            {% endif %}
         </div>
 
         <!-- Mobile Menu Toggle -->

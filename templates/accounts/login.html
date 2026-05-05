@@ -18,12 +18,18 @@
             
             <div class="form-group">
                 <label class="form-label">Email</label>
-                <input type="email" name="email" required class="form-input" placeholder="your@gmail.com">
+                {{ form.email }}
+                {% if form.email.errors %}
+                    <div class="form-error">{{ form.email.errors.0 }}</div>
+                {% endif %}
             </div>
 
             <div class="form-group">
                 <label class="form-label">Password</label>
-                <input type="password" name="password" required class="form-input" placeholder="••••••••">
+                {{ form.password }}
+                {% if form.password.errors %}
+                    <div class="form-error">{{ form.password.errors.0 }}</div>
+                {% endif %}
             </div>
 
             <button type="submit" class="btn btn-primary btn-block">Sign In</button>

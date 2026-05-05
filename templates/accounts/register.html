@@ -11,29 +11,43 @@
 <div class="auth-container">
     <div class="auth-card">
         <h1 class="auth-heading">Create Account</h1>
-        <p class="auth-subtext">Join thousands of job seekers</p>
+        <p class="auth-subtext">Join thousands of job seekers and start your career</p>
         
         <form method="POST" class="form-container">
             {% csrf_token %}
             
             <div class="form-group">
-                <label class="form-label">Full Name</label>
-                <input type="text" name="full_name" required class="form-input" placeholder="sandesh">
+                <label class="form-label">Email</label>
+                {{ form.email }}
+                {% if form.email.errors %}
+                    <div class="form-error">{{ form.email.errors.0 }}</div>
+                {% endif %}
             </div>
 
             <div class="form-group">
-                <label class="form-label">Email</label>
-                <input type="email" name="email" required class="form-input" placeholder="your@gmail.com">
+                <label class="form-label">First Name</label>
+                {{ form.first_name }}
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Last Name</label>
+                {{ form.last_name }}
             </div>
 
             <div class="form-group">
                 <label class="form-label">Password</label>
-                <input type="password" name="password" required class="form-input" placeholder="••••••••">
+                {{ form.password1 }}
+                {% if form.password1.errors %}
+                    <div class="form-error">{{ form.password1.errors.0 }}</div>
+                {% endif %}
             </div>
 
             <div class="form-group">
                 <label class="form-label">Confirm Password</label>
-                <input type="password" name="password_confirm" required class="form-input" placeholder="••••••••">
+                {{ form.password2 }}
+                {% if form.password2.errors %}
+                    <div class="form-error">{{ form.password2.errors.0 }}</div>
+                {% endif %}
             </div>
 
             <button type="submit" class="btn btn-primary btn-block">Create Account</button>
