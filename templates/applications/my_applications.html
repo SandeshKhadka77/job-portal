@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}My Applications - Job Portal{% endblock %}
+
+{% block content %}
+<section class="saved-jobs-page">
+    <div class="container">
+        <header class="saved-jobs-header">
+            <h1>My Applications</h1>
+            <p>Track jobs you have applied for.</p>
+        </header>
+
+        {% if applications %}
+            <div class="saved-jobs-list">
+                {% for application in applications %}
+                    <article class="job-card">
+                        <div class="job-card-header">
+                            <h3>{{ application.job.title }}</h3>
+                            <p class="job-company">{{ application.job.company_name }}</p>
+                        </div>
+                        <div class="job-card-meta">
+                            <span>{{ application.job.location }}</span>
+                            <span>{{ application.job.salary_display }}</span>
+                        </div>
+                        <div class="job-card-badges">
+                            <span class="badge">{{ application.job.get_job_type_display }}</span>
+                            <span class="badge">{{ application.get_status_display }}</span>
+                        </div>
+                        <div class="job-card-actions">
+                            <a href="{% url 'job_detail' application.job.pk %}" class="btn btn-sm">View Job</a>
+                        </div>
+                    </article>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="saved-jobs-empty">
+                <h2>No applications yet</h2>
+                <p>You have not applied to any jobs yet.</p>
+                <a href="{% url 'home' %}" class="btn btn-primary">Browse Jobs</a>
+            </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

@@ -44,3 +44,18 @@ def apply_job(request, pk):
 		'job': job,
 		'initial_data': initial_data
 	})
+
+
+@login_required(login_url='login')
+@require_http_methods(['GET'])
+def my_applications(request):
+	applications = (
+		Application.objects
+		.filter(user=request.user)
+		.select_related('job')
+		.order_by('-created_at')
+	)
+
+	return render(request, 'applications/my_applications.html', {
+		'applications': applications,
+	})
