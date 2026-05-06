@@ -2,6 +2,7 @@ from django.contrib import messages
 from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_http_methods
+from django.core.paginator import Paginator
 
 from jobs.models import Job
 
@@ -49,13 +50,28 @@ def apply_job(request, pk):
 @login_required(login_url='login')
 @require_http_methods(['GET'])
 def my_applications(request):
-	applications = (
+	status = request.GET.get('status', '').strip()
+	page_number = request.GET.get('page', 1)
+
+	applications_qs = (
 		Application.objects
 		.filter(user=request.user)
 		.select_related('job')
 		.order_by('-created_at')
 	)
 
+	valid_statuses = {choice[0] for choice in Application.STATUS_CHOICES}
+	if status in valid_statuses:
+		applications_qs = applications_qs.filter(status=status)
+	else:
+		status = ''
+
+	paginator = Paginator(applications_qs, 6)
+	page_obj = paginator.get_page(page_number)
+
 	return render(request, 'applications/my_applications.html', {
-		'applications': applications,
+		'applications': page_obj.object_list,
+		'page_obj': page_obj,
+		'status': status,
+		'status_choices': Application.STATUS_CHOICES,
 	})
