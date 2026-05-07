@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Application Details - Job Portal{% endblock %}
+
+{% block page_css %}
+    <link rel="stylesheet" href="{% static 'css/pages/application-detail.css' %}">
+{% endblock %}
+
+{% block content %}
+<section class="application-detail-page">
+    <div class="container application-detail-layout">
+        <div class="application-detail-card">
+            <a href="{% url 'my_applications' %}" class="back-link">&larr; Back to my applications</a>
+            <div class="application-detail-header">
+                <div>
+                    <p class="application-company">{{ application.job.company_name }}</p>
+                    <h1>{{ application.job.title }}</h1>
+                </div>
+                <span class="badge badge-status badge-status-{{ application.status }}">{{ application.get_status_display }}</span>
+            </div>
+
+            <div class="application-meta">
+                <div>
+                    <span class="meta-label">Applicant</span>
+                    <p>{{ application.full_name }}</p>
+                </div>
+                <div>
+                    <span class="meta-label">Email</span>
+                    <p>{{ application.email }}</p>
+                </div>
+                <div>
+                    <span class="meta-label">Phone</span>
+                    <p>{% if application.phone %}{{ application.phone }}{% else %}Not provided{% endif %}</p>
+                </div>
+                <div>
+                    <span class="meta-label">Applied on</span>
+                    <p>{{ application.created_at|date:"M d, Y" }}</p>
+                </div>
+            </div>
+
+            <div class="application-letter">
+                <h2>Cover Letter</h2>
+                <p>{{ application.cover_letter|linebreaksbr }}</p>
+            </div>
+        </div>
+
+        <aside class="application-summary">
+            <h2>Job Summary</h2>
+            <p><strong>Location:</strong> {{ application.job.location }}</p>
+            <p><strong>Salary:</strong> {{ application.job.salary_display }}</p>
+            <p><strong>Type:</strong> {{ application.job.get_job_type_display }}</p>
+            {% if application.job.is_remote %}
+                <p><strong>Remote:</strong> Yes</p>
+            {% endif %}
+            <a href="{% url 'job_detail' application.job.pk %}" class="btn btn-primary btn-sm">View Job</a>
+        </aside>
+    </div>
+</section>
+{% endblock %}

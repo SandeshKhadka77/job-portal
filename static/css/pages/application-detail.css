@@ -1,0 +1,111 @@
+.application-detail-page {
+    padding: 2rem 0 3rem;
+    background: var(--bg-light);
+    min-height: calc(100vh - 80px);
+}
+
+.application-detail-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 2fr) minmax(280px, 1fr);
+    gap: 1.5rem;
+}
+
+.application-detail-card,
+.application-summary {
+    background: var(--bg-white);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    padding: 1.5rem;
+}
+
+.application-detail-header {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    align-items: flex-start;
+    margin: 1rem 0 1.5rem;
+}
+
+.application-company {
+    color: var(--text-gray);
+    margin: 0 0 0.25rem;
+    font-weight: 500;
+}
+
+.application-detail-header h1 {
+    margin: 0;
+    font-size: 2rem;
+    color: var(--text-dark);
+}
+
+.badge-status {
+    background: var(--primary);
+    color: #fff;
+}
+
+.badge-status-submitted { background: #2563eb; }
+.badge-status-reviewed { background: #0ea5e9; }
+.badge-status-shortlisted { background: #10b981; }
+.badge-status-rejected { background: #ef4444; }
+.badge-status-withdrawn { background: #6b7280; }
+
+.application-meta {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+    padding: 1rem 0 1.5rem;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+}
+
+.meta-label {
+    display: block;
+    color: var(--text-gray);
+    font-size: 0.85rem;
+    margin-bottom: 0.25rem;
+}
+
+.application-meta p {
+    margin: 0;
+    color: var(--text-dark);
+}
+
+.application-letter {
+    padding-top: 1.25rem;
+}
+
+.application-letter h2,
+.application-summary h2 {
+    margin: 0 0 1rem;
+    color: var(--text-dark);
+    font-size: 1.25rem;
+}
+
+.application-letter p {
+    color: var(--text-dark);
+    line-height: 1.7;
+    white-space: pre-line;
+}
+
+.application-summary p {
+    color: var(--text-dark);
+    margin: 0 0 0.75rem;
+}
+
+.application-summary .btn {
+    margin-top: 1rem;
+}
+
+@media (max-width: 900px) {
+    .application-detail-layout {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 640px) {
+    .application-detail-header,
+    .application-meta {
+        grid-template-columns: 1fr;
+        display: grid;
+    }
+}

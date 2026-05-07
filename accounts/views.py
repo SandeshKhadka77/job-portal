@@ -96,10 +96,12 @@ def profile_view(request):
     saved_jobs_count = UserSavedJob.objects.filter(user=user).count()
     applications_count = user.applications.count()
     saved_jobs = UserSavedJob.objects.filter(user=user).select_related('job').order_by('-saved_at')[:5]
+    recent_applications = user.applications.select_related('job').order_by('-created_at')[:5]
     
     return render(request, 'accounts/profile.html', {
         'saved_jobs_count': saved_jobs_count,
         'applications_count': applications_count,
         'recent_saved_jobs': saved_jobs,
+        'recent_applications': recent_applications,
     })
 

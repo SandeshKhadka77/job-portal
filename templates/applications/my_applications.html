@@ -39,6 +39,7 @@
                         </div>
                         <div class="job-card-actions">
                             <a href="{% url 'job_detail' application.job.pk %}" class="btn btn-sm">View Job</a>
+                            <a href="{% url 'application_detail' application.pk %}" class="btn btn-sm btn-link-primary">View Application</a>
                         </div>
                     </article>
                 {% endfor %}

@@ -75,3 +75,17 @@ def my_applications(request):
 		'status': status,
 		'status_choices': Application.STATUS_CHOICES,
 	})
+
+
+@login_required(login_url='login')
+@require_http_methods(['GET'])
+def application_detail(request, pk):
+	application = get_object_or_404(
+		Application.objects.select_related('job', 'user'),
+		pk=pk,
+		user=request.user,
+	)
+
+	return render(request, 'applications/application_detail.html', {
+		'application': application,
+	})

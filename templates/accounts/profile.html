@@ -68,6 +68,37 @@
                 <p class="empty-state">You haven't saved any jobs yet. <a href="{% url 'home' %}">Browse jobs</a></p>
             {% endif %}
         </div>
+
+        <div class="profile-section">
+            <h2>Recent Applications</h2>
+            {% if recent_applications %}
+                <div class="saved-jobs-list">
+                    {% for application in recent_applications %}
+                        <article class="job-card">
+                            <div class="job-card-header">
+                                <h3>{{ application.job.title }}</h3>
+                                <p class="job-company">{{ application.job.company_name }}</p>
+                            </div>
+                            <div class="job-card-meta">
+                                <span class="job-location">{{ application.job.location }}</span>
+                                <span class="job-salary">{{ application.job.salary_display }}</span>
+                            </div>
+                            <div class="job-card-badges">
+                                <span class="badge">{{ application.get_status_display }}</span>
+                            </div>
+                            <div class="job-card-actions">
+                                <a href="{% url 'application_detail' application.pk %}" class="btn btn-sm">View Application</a>
+                            </div>
+                        </article>
+                    {% endfor %}
+                </div>
+                <div class="view-all-link">
+                    <a href="{% url 'my_applications' %}">View all applications →</a>
+                </div>
+            {% else %}
+                <p class="empty-state">You have not submitted any applications yet. <a href="{% url 'home' %}">Browse jobs</a></p>
+            {% endif %}
+        </div>
     </div>
 </div>
 {% endblock %}
