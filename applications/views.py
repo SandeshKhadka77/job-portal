@@ -22,7 +22,18 @@ def apply_job(request, pk):
 	job = get_object_or_404(Job, pk=pk)
 	user = request.user
 
+#  users cannot spam multiple applications for the same job and helps maintain a clean application history.
 	if request.method == 'POST':
+		active_application = (
+			Application.objects
+			.filter(user=user, job=job, status__in=ACTIVE_APPLICATION_STATUSES)
+			.order_by('-created_at')
+			.first()
+		)
+		if active_application is not None:
+			messages.error(request, 'You already have an active application for this job.')
+			return redirect('application_detail', pk=active_application.pk)
+
 		full_name = request.POST.get('full_name', '').strip()
 		email = request.POST.get('email', '').strip()
 		phone = request.POST.get('phone', '').strip()
