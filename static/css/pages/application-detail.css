@@ -74,6 +74,20 @@
     padding-top: 1.25rem;
 }
 
+.application-actions {
+    margin-top: 1.5rem;
+    padding-top: 1.25rem;
+    border-top: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.application-note {
+    margin: 0;
+    color: var(--text-gray);
+}
+
 .application-letter h2,
 .application-summary h2 {
     margin: 0 0 1rem;

@@ -43,6 +43,17 @@
                 <h2>Cover Letter</h2>
                 <p>{{ application.cover_letter|linebreaksbr }}</p>
             </div>
+
+            <div class="application-actions">
+                {% if can_withdraw %}
+                    <form method="post" action="{% url 'withdraw_application' application.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-secondary">Withdraw Application</button>
+                    </form>
+                {% else %}
+                    <p class="application-note">This application is already {{ application.get_status_display|lower }}.</p>
+                {% endif %}
+            </div>
         </div>
 
         <aside class="application-summary">

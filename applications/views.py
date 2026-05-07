@@ -9,6 +9,13 @@ from jobs.models import Job
 from .models import Application
 
 
+ACTIVE_APPLICATION_STATUSES = {
+	Application.STATUS_SUBMITTED,
+	Application.STATUS_REVIEWED,
+	Application.STATUS_SHORTLISTED,
+}
+
+
 @login_required(login_url='login')
 @require_http_methods(['GET', 'POST'])
 def apply_job(request, pk):
@@ -88,4 +95,24 @@ def application_detail(request, pk):
 
 	return render(request, 'applications/application_detail.html', {
 		'application': application,
+		'can_withdraw': application.status in ACTIVE_APPLICATION_STATUSES,
 	})
+
+
+@login_required(login_url='login')
+@require_http_methods(['POST'])
+def withdraw_application(request, pk):
+	application = get_object_or_404(
+		Application.objects.select_related('job'),
+		pk=pk,
+		user=request.user,
+	)
+
+	if application.status not in ACTIVE_APPLICATION_STATUSES:
+		messages.error(request, 'This application can no longer be withdrawn.')
+		return redirect('application_detail', pk=application.pk)
+
+	application.status = Application.STATUS_WITHDRAWN
+	application.save(update_fields=['status'])
+	messages.success(request, f'Your application for {application.job.title} has been withdrawn.')
+	return redirect('application_detail', pk=application.pk)
