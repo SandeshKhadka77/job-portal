@@ -73,6 +73,24 @@
     gap: 1rem;
 }
 
+.apply-notice {
+    margin-top: 1.5rem;
+    border: 1px solid #bfdbfe;
+    background: #eff6ff;
+    border-radius: var(--radius-lg);
+    padding: 1rem;
+}
+
+.apply-notice h2 {
+    margin: 0 0 0.5rem;
+    color: #1d4ed8;
+}
+
+.apply-notice p {
+    margin: 0 0 1rem;
+    color: #1e3a8a;
+}
+
 .apply-summary {
     padding: 1.5rem;
 }

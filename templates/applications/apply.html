@@ -23,26 +23,34 @@
                 </div>
             {% endif %}
 
-            <form method="post" class="apply-form">
-                {% csrf_token %}
-                <div class="form-group">
-                    <label class="form-label" for="full_name">Full name</label>
-                    <input class="form-input" type="text" id="full_name" name="full_name" value="{{ initial_data.full_name }}" required>
+            {% if existing_active_application %}
+                <div class="apply-notice">
+                    <h2 class="heading-3">You already applied to this job</h2>
+                    <p>Your current application is still active. Open it to track status or withdraw it first before applying again.</p>
+                    <a href="{% url 'application_detail' existing_active_application.pk %}" class="btn btn-primary btn-sm">View My Application</a>
                 </div>
-                <div class="form-group">
-                    <label class="form-label" for="email">Email</label>
-                    <input class="form-input" type="email" id="email" name="email" value="{{ initial_data.email }}" required>
-                </div>
-                <div class="form-group">
-                    <label class="form-label" for="phone">Phone</label>
-                    <input class="form-input" type="text" id="phone" name="phone">
-                </div>
-                <div class="form-group">
-                    <label class="form-label" for="cover_letter">Cover letter</label>
-                    <textarea class="form-textarea" id="cover_letter" name="cover_letter" rows="8" required></textarea>
-                </div>
-                <button type="submit" class="btn btn-primary">Submit Application</button>
-            </form>
+            {% else %}
+                <form method="post" class="apply-form">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label class="form-label" for="full_name">Full name</label>
+                        <input class="form-input" type="text" id="full_name" name="full_name" value="{{ initial_data.full_name }}" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="email">Email</label>
+                        <input class="form-input" type="email" id="email" name="email" value="{{ initial_data.email }}" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="phone">Phone</label>
+                        <input class="form-input" type="text" id="phone" name="phone">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="cover_letter">Cover letter</label>
+                        <textarea class="form-textarea" id="cover_letter" name="cover_letter" rows="8" required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Submit Application</button>
+                </form>
+            {% endif %}
         </div>
 
         <aside class="apply-summary">

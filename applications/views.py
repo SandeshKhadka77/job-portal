@@ -21,18 +21,18 @@ ACTIVE_APPLICATION_STATUSES = {
 def apply_job(request, pk):
 	job = get_object_or_404(Job, pk=pk)
 	user = request.user
+	existing_active_application = (
+		Application.objects
+		.filter(user=user, job=job, status__in=ACTIVE_APPLICATION_STATUSES)
+		.order_by('-created_at')
+		.first()
+	)
 
 #  users cannot spam multiple applications for the same job and helps maintain a clean application history.
 	if request.method == 'POST':
-		active_application = (
-			Application.objects
-			.filter(user=user, job=job, status__in=ACTIVE_APPLICATION_STATUSES)
-			.order_by('-created_at')
-			.first()
-		)
-		if active_application is not None:
+		if existing_active_application is not None:
 			messages.error(request, 'You already have an active application for this job.')
-			return redirect('application_detail', pk=active_application.pk)
+			return redirect('application_detail', pk=existing_active_application.pk)
 
 		full_name = request.POST.get('full_name', '').strip()
 		email = request.POST.get('email', '').strip()
@@ -61,10 +61,11 @@ def apply_job(request, pk):
 
 	return render(request, 'applications/apply.html', {
 		'job': job,
-		'initial_data': initial_data
+		'initial_data': initial_data,
+		'existing_active_application': existing_active_application,
 	})
 
-
+# allows users to view their job applications with pagination and filtering by status.
 @login_required(login_url='login')
 @require_http_methods(['GET'])
 def my_applications(request):
