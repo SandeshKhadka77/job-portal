@@ -15,17 +15,33 @@ ACTIVE_APPLICATION_STATUSES = {
 	Application.STATUS_SHORTLISTED,
 }
 
+REAPPLY_ALLOWED_STATUSES = {
+	Application.STATUS_WITHDRAWN,
+	Application.STATUS_REJECTED,
+}
+
 
 @login_required(login_url='login')
 @require_http_methods(['GET', 'POST'])
 def apply_job(request, pk):
 	job = get_object_or_404(Job, pk=pk)
 	user = request.user
+	latest_application = (
+		Application.objects
+		.filter(user=user, job=job)
+		.order_by('-created_at')
+		.first()
+	)
 	existing_active_application = (
 		Application.objects
 		.filter(user=user, job=job, status__in=ACTIVE_APPLICATION_STATUSES)
 		.order_by('-created_at')
 		.first()
+	)
+	can_reapply = (
+		latest_application is not None and
+		existing_active_application is None and
+		latest_application.status in REAPPLY_ALLOWED_STATUSES
 	)
 
 #  users cannot spam multiple applications for the same job and helps maintain a clean application history.
@@ -33,6 +49,10 @@ def apply_job(request, pk):
 		if existing_active_application is not None:
 			messages.error(request, 'You already have an active application for this job.')
 			return redirect('application_detail', pk=existing_active_application.pk)
+
+		if latest_application is not None and latest_application.status not in ACTIVE_APPLICATION_STATUSES and latest_application.status not in REAPPLY_ALLOWED_STATUSES:
+			messages.error(request, 'You cannot reapply for this job right now.')
+			return redirect('application_detail', pk=latest_application.pk)
 
 		full_name = request.POST.get('full_name', '').strip()
 		email = request.POST.get('email', '').strip()
@@ -63,6 +83,8 @@ def apply_job(request, pk):
 		'job': job,
 		'initial_data': initial_data,
 		'existing_active_application': existing_active_application,
+		'latest_application': latest_application,
+		'can_reapply': can_reapply,
 	})
 
 # allows users to view their job applications with pagination and filtering by status.

@@ -30,6 +30,12 @@
                     <a href="{% url 'application_detail' existing_active_application.pk %}" class="btn btn-primary btn-sm">View My Application</a>
                 </div>
             {% else %}
+                {% if can_reapply %}
+                    <div class="apply-notice">
+                        <h2 class="heading-3">You can reapply to this job</h2>
+                        <p>Your last application was {{ latest_application.get_status_display|lower }}, so you can submit a new application.</p>
+                    </div>
+                {% endif %}
                 <form method="post" class="apply-form">
                     {% csrf_token %}
                     <div class="form-group">
