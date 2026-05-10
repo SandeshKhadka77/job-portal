@@ -4,8 +4,10 @@ from django.contrib.auth.models import User
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_http_methods
+from django.db.models import Count
 from .forms import RegisterForm, LoginForm
 from jobs.models import UserSavedJob, Job
+from applications.models import Application
 
 
 @require_http_methods(['GET', 'POST'])
@@ -97,11 +99,27 @@ def profile_view(request):
     applications_count = user.applications.count()
     saved_jobs = UserSavedJob.objects.filter(user=user).select_related('job').order_by('-saved_at')[:5]
     recent_applications = user.applications.select_related('job').order_by('-created_at')[:5]
-    
+   
+    # Aggregate application counts by status for dashboard
+    status_counts_qs = (
+        Application.objects
+        .filter(user=user)
+        .values('status')
+        .annotate(count=Count('id'))
+    )
+    status_counts = {item['status']: item['count'] for item in status_counts_qs}
+
+    # Build summary list preserving the display order
+    status_summary = [
+        (key, label, status_counts.get(key, 0))
+        for key, label in Application.STATUS_CHOICES
+    ]
+
     return render(request, 'accounts/profile.html', {
         'saved_jobs_count': saved_jobs_count,
         'applications_count': applications_count,
         'recent_saved_jobs': saved_jobs,
         'recent_applications': recent_applications,
+        'status_summary': status_summary,
     })
 

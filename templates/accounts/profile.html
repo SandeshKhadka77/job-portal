@@ -32,6 +32,16 @@
                 <div class="stat-value">{{ applications_count }}</div>
                 <div class="stat-label">Applications</div>
             </div>
+            {% if status_summary %}
+            <div class="status-summary">
+                {% for status_key, status_label, status_count in status_summary %}
+                    <div class="status-card">
+                        <div class="status-value">{{ status_count }}</div>
+                        <div class="status-label">{{ status_label }}</div>
+                    </div>
+                {% endfor %}
+            </div>
+            {% endif %}
         </div>
 
         <!-- Recent Saved Jobs -->
