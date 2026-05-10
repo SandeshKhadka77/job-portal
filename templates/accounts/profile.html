@@ -20,6 +20,11 @@
                 {% csrf_token %}
                 <button type="submit" class="btn btn-secondary">Logout</button>
             </form>
+            <div class="profile-quick-actions">
+                <a href="{% url 'home' %}" class="btn btn-primary">Browse Jobs</a>
+                <a href="{% url 'saved_jobs' %}" class="btn btn-outline">Saved Jobs</a>
+                <a href="{% url 'my_applications' %}" class="btn btn-outline">My Applications</a>
+            </div>
         </div>
 
         <!-- Stats -->
@@ -75,7 +80,11 @@
                     <a href="{% url 'saved_jobs' %}">View all saved jobs →</a>
                 </div>
             {% else %}
-                <p class="empty-state">You haven't saved any jobs yet. <a href="{% url 'home' %}">Browse jobs</a></p>
+                <p class="empty-state">You haven't saved any jobs yet.</p>
+                <div class="empty-actions">
+                    <a href="{% url 'home' %}" class="btn btn-primary">Browse Jobs</a>
+                    <a href="{% url 'my_applications' %}" class="btn btn-outline">View Applications</a>
+                </div>
             {% endif %}
         </div>
 
@@ -106,7 +115,11 @@
                     <a href="{% url 'my_applications' %}">View all applications →</a>
                 </div>
             {% else %}
-                <p class="empty-state">You have not submitted any applications yet. <a href="{% url 'home' %}">Browse jobs</a></p>
+                <p class="empty-state">You have not submitted any applications yet.</p>
+                <div class="empty-actions">
+                    <a href="{% url 'home' %}" class="btn btn-primary">Browse Jobs</a>
+                    <a href="{% url 'saved_jobs' %}" class="btn btn-outline">Saved Jobs</a>
+                </div>
             {% endif %}
         </div>
     </div>
