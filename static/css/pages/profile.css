@@ -1,3 +1,72 @@
+/* Profile page styles: status summary, quick actions, empty states */
+.profile-container {
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 1.5rem;
+}
+
+.profile-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.profile-info h1 {
+  margin: 0;
+  font-size: 1.5rem;
+}
+
+.profile-quick-actions {
+  margin-left: auto;
+  display: flex;
+  gap: 0.5rem;
+}
+
+.profile-stats {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  margin-top: 1rem;
+  flex-wrap: wrap;
+}
+
+.stat-card {
+  background: #ffffff;
+  border: 1px solid #e6e9ef;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  min-width: 120px;
+  text-align: center;
+}
+.stat-value { font-size: 1.25rem; font-weight: 600; }
+.stat-label { color: #6b7280; font-size: 0.85rem; }
+
+.status-summary { display: flex; gap: 0.5rem; margin-left: 0.5rem; flex-wrap: wrap; }
+.status-card {
+  background: #f8fafc;
+  border: 1px solid #e6eef8;
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+  text-align: center;
+  min-width: 100px;
+}
+.status-value { font-weight: 700; color: #111827; }
+.status-label { display: block; color: #6b7280; font-size: 0.8rem; }
+
+.saved-jobs-list, .saved-jobs-list .job-card { display: grid; gap: 0.75rem; }
+.job-card { background: #fff; border: 1px solid #e6e9ef; padding: 0.75rem; border-radius: 8px; }
+
+.empty-state { color: #6b7280; margin: 0.5rem 0; }
+.empty-actions { display: flex; gap: 0.5rem; margin-top: 0.5rem; }
+
+/* Button variants fallback if global classes are not present */
+.btn { display: inline-block; padding: 0.45rem 0.75rem; border-radius: 6px; text-decoration: none; }
+.btn-primary { background: #2563eb; color: white; border: 1px solid #2563eb; }
+.btn-outline { background: transparent; color: #2563eb; border: 1px solid #c7ddff; }
+
+/* Accessibility helpers */
+.status-card, .stat-card { outline: none; }
+.status-card:focus, .stat-card:focus, .btn:focus { box-shadow: 0 0 0 3px rgba(37,99,235,0.18); }
 /* Profile Page */
 .profile-page {
     padding: 2rem 0;
