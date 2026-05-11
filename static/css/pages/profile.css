@@ -1,4 +1,3 @@
-/* Profile page styles: status summary, quick actions, empty states */
 .profile-container {
   max-width: 980px;
   margin: 0 auto;
@@ -38,8 +37,13 @@
   min-width: 120px;
   text-align: center;
 }
-.stat-value { font-size: 1.25rem; font-weight: 600; }
-.stat-label { color: #6b7280; font-size: 0.85rem; }
+.stat-value { 
+font-size: 1.25rem; 
+font-weight: 600; 
+}
+.stat-label {
+ color: #6b7280; 
+ font-size: 0.85rem; }
 
 .status-summary { display: flex; gap: 0.5rem; margin-left: 0.5rem; flex-wrap: wrap; }
 .status-card {
@@ -66,8 +70,73 @@
 
 /* Accessibility helpers */
 .status-card, .stat-card { outline: none; }
-.status-card:focus, .stat-card:focus, .btn:focus { box-shadow: 0 0 0 3px rgba(37,99,235,0.18); }
-/* Profile Page */
+.status-card:focus, .stat-card:focus, .btn:focus { 
+  box-shadow: 0 0 0 3px rgba(37,99,235,0.18);
+  outline: 2px solid #2563eb;
+  outline-offset: 2px;
+}
+
+/* Skip link - visible on focus for keyboard users */
+.skip-link {
+  position: absolute;
+  top: -40px;
+  left: 0;
+  background: #2563eb;
+  color: white;
+  padding: 8px;
+  text-decoration: none;
+  z-index: 100;
+  border-radius: 0 0 6px 0;
+}
+.skip-link:focus {
+  top: 0;
+}
+
+/* Keyboard navigation focus indicators */
+[role="button"]:focus,
+[role="status"]:focus,
+a:focus-visible {
+  outline: 2px solid #2563eb;
+  outline-offset: 2px;
+}
+
+/* Improve contrast for interactive elements */
+.btn {
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.btn:hover, .btn:active {
+  opacity: 0.9;
+}
+
+/* Profile sections for better semantic navigation */
+.profile-section {
+  margin-bottom: 2rem;
+}
+.profile-section h2 {
+  margin-top: 0;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid #e6e9ef;
+}
+
+/* Status and stat cards keyboard accessible */
+.stat-card, .status-card {
+  transition: all 0.2s ease;
+  cursor: default;
+}
+.stat-card:hover, .status-card:hover {
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+/* List items accessibility */
+[role="list"] {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+[role="listitem"] {
+  display: block;
+}
 .profile-page {
     padding: 2rem 0;
     background-color: var(--bg-light);

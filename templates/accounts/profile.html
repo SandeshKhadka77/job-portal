@@ -8,54 +8,57 @@
 {% endblock %}
 
 {% block content %}
-<div class="profile-page">
+<!-- Skip to main content link for keyboard users -->
+<a href="#main-content" class="skip-link">Skip to main content</a>
+
+<main class="profile-page" id="main-content" role="main">
     <div class="profile-container">
         <!-- Header -->
-        <div class="profile-header">
+        <header class="profile-header" role="banner">
             <div class="profile-info">
-                <h1>{{ user.first_name|default:user.email }}</h1>
-                <p class="profile-email">{{ user.email }}</p>
+                <h1>{{ user.first_name|default:user.email }}'s Profile</h1>
+                <p class="profile-email" aria-label="Email address">{{ user.email }}</p>
             </div>
-            <form method="POST" action="{% url 'logout' %}" class="profile-actions">
+            <form method="POST" action="{% url 'logout' %}" class="profile-actions" role="form" aria-label="Logout form">
                 {% csrf_token %}
-                <button type="submit" class="btn btn-secondary">Logout</button>
+                <button type="submit" class="btn btn-secondary" aria-label="Log out of your account">Logout</button>
             </form>
-            <div class="profile-quick-actions">
-                <a href="{% url 'home' %}" class="btn btn-primary">Browse Jobs</a>
-                <a href="{% url 'saved_jobs' %}" class="btn btn-outline">Saved Jobs</a>
-                <a href="{% url 'my_applications' %}" class="btn btn-outline">My Applications</a>
-            </div>
-        </div>
+            <nav class="profile-quick-actions" aria-label="Quick navigation">
+                <a href="{% url 'home' %}" class="btn btn-primary" role="button">Browse Jobs</a>
+                <a href="{% url 'saved_jobs' %}" class="btn btn-outline" role="button">Saved Jobs</a>
+                <a href="{% url 'my_applications' %}" class="btn btn-outline" role="button">My Applications</a>
+            </nav>
+        </header>
 
-        <!-- Stats -->
-        <div class="profile-stats">
-            <div class="stat-card">
-                <div class="stat-value">{{ saved_jobs_count }}</div>
+        <!-- Stats Section -->
+        <section class="profile-stats" aria-label="Profile statistics summary">
+            <div class="stat-card" role="status" aria-label="Saved jobs count">
+                <div class="stat-value" aria-live="polite">{{ saved_jobs_count }}</div>
                 <div class="stat-label">Saved Jobs</div>
             </div>
-            <div class="stat-card">
-                <div class="stat-value">{{ applications_count }}</div>
+            <div class="stat-card" role="status" aria-label="Total applications count">
+                <div class="stat-value" aria-live="polite">{{ applications_count }}</div>
                 <div class="stat-label">Applications</div>
             </div>
             {% if status_summary %}
-            <div class="status-summary">
+            <nav class="status-summary" aria-label="Application status breakdown">
                 {% for status_key, status_label, status_count in status_summary %}
-                    <div class="status-card">
-                        <div class="status-value">{{ status_count }}</div>
+                    <div class="status-card" role="status" tabindex="0" aria-label="{{ status_label }}: {{ status_count }} application{{ status_count|pluralize }}">
+                        <div class="status-value" aria-live="polite">{{ status_count }}</div>
                         <div class="status-label">{{ status_label }}</div>
                     </div>
                 {% endfor %}
-            </div>
+            </nav>
             {% endif %}
-        </div>
+        </section>
 
         <!-- Recent Saved Jobs -->
-        <div class="profile-section">
-            <h2>Recent Saved Jobs</h2>
+        <section class="profile-section" aria-labelledby="saved-jobs-heading">
+            <h2 id="saved-jobs-heading">Recent Saved Jobs</h2>
             {% if recent_saved_jobs %}
-                <div class="saved-jobs-list">
+                <div class="saved-jobs-list" role="list">
                     {% for saved_job in recent_saved_jobs %}
-                        <article class="job-card">
+                        <article class="job-card" role="listitem">
                             <div class="job-card-header">
                                 <h3>{{ saved_job.job.title }}</h3>
                                 <p class="job-company">{{ saved_job.job.company_name }}</p>
@@ -71,29 +74,29 @@
                                 {% endif %}
                             </div>
                             <div class="job-card-actions">
-                                <a href="{% url 'job_detail' saved_job.job.pk %}" class="btn btn-sm">View Details</a>
+                                <a href="{% url 'job_detail' saved_job.job.pk %}" class="btn btn-sm" aria-label="View details for {{ saved_job.job.title }}">View Details</a>
                             </div>
                         </article>
                     {% endfor %}
                 </div>
                 <div class="view-all-link">
-                    <a href="{% url 'saved_jobs' %}">View all saved jobs →</a>
+                    <a href="{% url 'saved_jobs' %}" aria-label="View all saved jobs">View all saved jobs →</a>
                 </div>
             {% else %}
                 <p class="empty-state">You haven't saved any jobs yet.</p>
-                <div class="empty-actions">
-                    <a href="{% url 'home' %}" class="btn btn-primary">Browse Jobs</a>
-                    <a href="{% url 'my_applications' %}" class="btn btn-outline">View Applications</a>
+                <div class="empty-actions" role="group" aria-label="Saved jobs empty state actions">
+                    <a href="{% url 'home' %}" class="btn btn-primary" role="button">Browse Jobs</a>
+                    <a href="{% url 'my_applications' %}" class="btn btn-outline" role="button">View Applications</a>
                 </div>
             {% endif %}
-        </div>
+        </section>
 
-        <div class="profile-section">
-            <h2>Recent Applications</h2>
+        <section class="profile-section" aria-labelledby="applications-heading">
+            <h2 id="applications-heading">Recent Applications</h2>
             {% if recent_applications %}
-                <div class="saved-jobs-list">
+                <div class="saved-jobs-list" role="list">
                     {% for application in recent_applications %}
-                        <article class="job-card">
+                        <article class="job-card" role="listitem">
                             <div class="job-card-header">
                                 <h3>{{ application.job.title }}</h3>
                                 <p class="job-company">{{ application.job.company_name }}</p>
@@ -106,22 +109,22 @@
                                 <span class="badge">{{ application.get_status_display }}</span>
                             </div>
                             <div class="job-card-actions">
-                                <a href="{% url 'application_detail' application.pk %}" class="btn btn-sm">View Application</a>
+                                <a href="{% url 'application_detail' application.pk %}" class="btn btn-sm" aria-label="View application for {{ application.job.title }}">View Application</a>
                             </div>
                         </article>
                     {% endfor %}
                 </div>
                 <div class="view-all-link">
-                    <a href="{% url 'my_applications' %}">View all applications →</a>
+                    <a href="{% url 'my_applications' %}" aria-label="View all your applications">View all applications →</a>
                 </div>
             {% else %}
                 <p class="empty-state">You have not submitted any applications yet.</p>
-                <div class="empty-actions">
-                    <a href="{% url 'home' %}" class="btn btn-primary">Browse Jobs</a>
-                    <a href="{% url 'saved_jobs' %}" class="btn btn-outline">Saved Jobs</a>
+                <div class="empty-actions" role="group" aria-label="Recent applications empty state actions">
+                    <a href="{% url 'home' %}" class="btn btn-primary" role="button">Browse Jobs</a>
+                    <a href="{% url 'saved_jobs' %}" class="btn btn-outline" role="button">Saved Jobs</a>
                 </div>
             {% endif %}
-        </div>
+        </section>
     </div>
-</div>
+</main>
 {% endblock %}
