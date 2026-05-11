@@ -2,6 +2,7 @@ from django import forms
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
 from django.core.exceptions import ValidationError
+from .models import Resume
 
 # Forms for user registration and login
 class RegisterForm(UserCreationForm):
@@ -55,3 +56,37 @@ class LoginForm(forms.Form):
         'placeholder': 'Enter your password',
         'autocomplete': 'current-password'
     }))
+
+
+# Resume upload form
+class ResumeForm(forms.ModelForm):
+    class Meta:
+        model = Resume
+        fields = ['file', 'name', 'is_default']
+        widgets = {
+            'file': forms.FileInput(attrs={
+                'class': 'form-input',
+                'accept': '.pdf,.docx,.doc',
+                'aria-label': 'Upload resume file (PDF, DOCX, or DOC)'
+            }),
+            'name': forms.TextInput(attrs={
+                'class': 'form-input',
+                'placeholder': 'e.g., Software Engineer Resume',
+                'maxlength': '255'
+            }),
+            'is_default': forms.CheckboxInput(attrs={
+                'class': 'form-checkbox',
+                'aria-label': 'Set as default resume'
+            })
+        }
+
+    def clean_file(self):
+        file = self.cleaned_data.get('file')
+        if file:
+            # Check file extension (redundant but for frontend validation message)
+            allowed_ext = ['pdf', 'docx', 'doc']
+            ext = file.name.split('.')[-1].lower()
+            if ext not in allowed_ext:
+                raise ValidationError('Only PDF, DOCX, and DOC files are allowed.')
+        return file
+
