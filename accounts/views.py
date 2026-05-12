@@ -5,7 +5,8 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_http_methods
 from django.db.models import Count
-from .forms import RegisterForm, LoginForm
+from .forms import RegisterForm, LoginForm, ResumeForm
+from .models import Resume
 from jobs.models import UserSavedJob, Job
 from applications.models import Application
 
@@ -91,14 +92,27 @@ def logout_view(request):
     messages.success(request, 'You have been logged out.')
     return redirect('home')
 
-# Profile view to display user information, saved jobs count, and applications count.
 @login_required(login_url='login')
+@require_http_methods(['GET', 'POST'])
 def profile_view(request):
     user = request.user
+    if request.method == 'POST' and request.POST.get('form_type') == 'resume_upload':
+        resume_form = ResumeForm(request.POST, request.FILES)
+        if resume_form.is_valid():
+            resume = resume_form.save(commit=False)
+            resume.user = user
+            resume.save()
+            messages.success(request, f'Resume "{resume.name}" uploaded successfully.')
+            return redirect('profile')
+        messages.error(request, 'Please correct the errors below and try again.')
+    else:
+        resume_form = ResumeForm()
+
     saved_jobs_count = UserSavedJob.objects.filter(user=user).count()
     applications_count = user.applications.count()
     saved_jobs = UserSavedJob.objects.filter(user=user).select_related('job').order_by('-saved_at')[:5]
     recent_applications = user.applications.select_related('job').order_by('-created_at')[:5]
+    resumes = Resume.objects.filter(user=user)
    
     # Aggregate application counts by status for dashboard
     status_counts_qs = (
@@ -121,5 +135,7 @@ def profile_view(request):
         'recent_saved_jobs': saved_jobs,
         'recent_applications': recent_applications,
         'status_summary': status_summary,
+        'resume_form': resume_form,
+        'resumes': resumes,
     })
 

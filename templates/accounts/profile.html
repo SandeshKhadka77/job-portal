@@ -52,6 +52,63 @@
             {% endif %}
         </section>
 
+        <section class="profile-section" aria-labelledby="resumes-heading">
+            <h2 id="resumes-heading">My Resumes</h2>
+            <div class="resume-upload-card">
+                <form method="POST" enctype="multipart/form-data" class="resume-upload-form" aria-label="Upload a new resume">
+                    {% csrf_token %}
+                    <input type="hidden" name="form_type" value="resume_upload">
+                    <div class="form-group">
+                        <label for="id_name">Resume name</label>
+                        {{ resume_form.name }}
+                        {% if resume_form.name.errors %}
+                            <div class="form-errors">{{ resume_form.name.errors }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="form-group">
+                        <label for="id_file">Resume file</label>
+                        {{ resume_form.file }}
+                        <p class="form-help">PDF, DOCX, or DOC up to 5MB.</p>
+                        {% if resume_form.file.errors %}
+                            <div class="form-errors">{{ resume_form.file.errors }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="form-group form-checkbox-group">
+                        <label for="id_is_default">{{ resume_form.is_default }} Set as default resume</label>
+                        {% if resume_form.is_default.errors %}
+                            <div class="form-errors">{{ resume_form.is_default.errors }}</div>
+                        {% endif %}
+                    </div>
+                    <button type="submit" class="btn btn-primary">Upload Resume</button>
+                </form>
+            </div>
+
+            {% if resumes %}
+                <div class="saved-jobs-list" role="list">
+                    {% for resume in resumes %}
+                        <article class="job-card" role="listitem">
+                            <div class="job-card-header">
+                                <h3>{{ resume.name }}</h3>
+                                <p class="job-company">{{ resume.get_file_extension|upper }} file · {{ resume.get_file_size_mb }} MB</p>
+                            </div>
+                            <div class="job-card-badges">
+                                {% if resume.is_default %}
+                                    <span class="badge badge-remote">Default Resume</span>
+                                {% endif %}
+                                <span class="badge">Uploaded {{ resume.created_at|date:"M d, Y" }}</span>
+                            </div>
+                            <div class="job-card-actions">
+                                <a href="{{ resume.file.url }}" target="_blank" rel="noopener noreferrer" class="btn btn-sm" aria-label="Preview {{ resume.name }}">Preview</a>
+                                <a href="{{ resume.file.url }}" download class="btn btn-sm btn-outline" aria-label="Download {{ resume.name }}">Download</a>
+                            </div>
+                        </article>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="empty-state">You haven't uploaded any resumes yet.</p>
+            {% endif %}
+        </section>
+
         <!-- Recent Saved Jobs -->
         <section class="profile-section" aria-labelledby="saved-jobs-heading">
             <h2 id="saved-jobs-heading">Recent Saved Jobs</h2>

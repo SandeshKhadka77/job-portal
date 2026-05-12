@@ -123,3 +123,44 @@ class ResumeModelTests(TestCase):
         self.assertTrue(resume1.is_default)
         self.assertTrue(resume2.is_default)
 
+
+class ResumeProfileViewTests(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(
+            username='profileuser',
+            email='profile@example.com',
+            password='testpass123'
+        )
+        self.client.force_login(self.user)
+
+    def create_test_file(self, filename='resume.pdf'):
+        return SimpleUploadedFile(filename, b'pdf-content', content_type='application/pdf')
+
+    def test_profile_shows_uploaded_resumes(self):
+        Resume.objects.create(
+            user=self.user,
+            file=self.create_test_file('profile-resume.pdf'),
+            name='Profile Resume',
+            is_default=True
+        )
+
+        response = self.client.get('/accounts/profile/')
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'My Resumes')
+        self.assertContains(response, 'Profile Resume')
+
+    def test_profile_resume_upload_creates_resume(self):
+        upload = self.create_test_file('new-resume.pdf')
+        response = self.client.post('/accounts/profile/', {
+            'form_type': 'resume_upload',
+            'name': 'New Resume',
+            'is_default': 'on',
+            'file': upload,
+        })
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(Resume.objects.filter(user=self.user).count(), 1)
+        resume = Resume.objects.get(user=self.user)
+        self.assertEqual(resume.name, 'New Resume')
+        self.assertTrue(resume.is_default)
+

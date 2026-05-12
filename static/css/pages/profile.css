@@ -371,3 +371,53 @@ a:focus-visible {
         gap: 0.5rem;
     }
 }
+
+/* Resume section */
+.resume-upload-card {
+    background-color: var(--bg-light, #f8fafc);
+    border: 1px solid var(--border, #e5e7eb);
+    border-radius: var(--radius-lg);
+    padding: 1.25rem;
+    margin-bottom: 1.5rem;
+}
+
+.resume-upload-form {
+    display: grid;
+    gap: 1rem;
+}
+
+.form-group {
+    display: grid;
+    gap: 0.5rem;
+}
+
+.form-group label {
+    font-weight: 600;
+    color: var(--text-dark, #111827);
+}
+
+.form-help {
+    margin: 0;
+    font-size: 0.875rem;
+    color: var(--text-gray, #6b7280);
+}
+
+.form-errors {
+    color: #b91c1c;
+    font-size: 0.875rem;
+}
+
+.form-checkbox-group label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 500;
+}
+
+.profile-section .job-card {
+    background-color: var(--bg-white, #fff);
+}
+
+.profile-section .badge-remote {
+    background-color: var(--success, #10b981);
+}
