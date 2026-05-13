@@ -5,11 +5,11 @@ from .models import Application
 
 @admin.register(Application)
 class ApplicationAdmin(admin.ModelAdmin):
-	list_display = ('full_name', 'job', 'email', 'user', 'status', 'created_at')
+	list_display = ('full_name', 'job', 'email', 'user', 'has_resume', 'status', 'created_at')
 	list_filter = ('status', 'created_at', 'job__job_type', 'user')
 	search_fields = ('full_name', 'email', 'user__email', 'job__title', 'job__company_name')
 	readonly_fields = ('created_at',)
-	raw_id_fields = ('user', 'job')
+	raw_id_fields = ('user', 'job', 'resume')
 	actions = (
 		'mark_as_reviewed',
 		'mark_as_shortlisted',
@@ -36,3 +36,8 @@ class ApplicationAdmin(admin.ModelAdmin):
 	def mark_as_withdrawn(self, request, queryset):
 		updated = queryset.update(status=Application.STATUS_WITHDRAWN)
 		self.message_user(request, f'{updated} application(s) marked as withdrawn.')
+
+	def has_resume(self, obj):
+		"""Display whether application has an attached resume"""
+		return 'Yes' if obj.resume else 'No'
+	has_resume.short_description = 'Has Resume'

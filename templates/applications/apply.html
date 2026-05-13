@@ -50,6 +50,20 @@
                         <label class="form-label" for="phone">Phone</label>
                         <input class="form-input" type="text" id="phone" name="phone">
                     </div>
+                    {% if user_resumes %}
+                    <div class="form-group">
+                        <label class="form-label" for="resume_id">Resume (optional)</label>
+                        <select class="form-input" id="resume_id" name="resume_id">
+                            <option value="">-- No resume --</option>
+                            {% for resume in user_resumes %}
+                                <option value="{{ resume.id }}" {% if default_resume.id == resume.id %}selected{% endif %}>
+                                    {{ resume.name }} ({{ resume.get_file_extension|upper }}, {{ resume.get_file_size_mb }} MB)
+                                    {% if resume.is_default %} · Default{% endif %}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    {% endif %}
                     <div class="form-group">
                         <label class="form-label" for="cover_letter">Cover letter</label>
                         <textarea class="form-textarea" id="cover_letter" name="cover_letter" rows="8" required></textarea>

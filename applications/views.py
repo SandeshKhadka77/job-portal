@@ -5,6 +5,7 @@ from django.views.decorators.http import require_http_methods
 from django.core.paginator import Paginator
 
 from jobs.models import Job
+from accounts.models import Resume
 
 from .models import Application
 
@@ -58,13 +59,23 @@ def apply_job(request, pk):
 		email = request.POST.get('email', '').strip()
 		phone = request.POST.get('phone', '').strip()
 		cover_letter = request.POST.get('cover_letter', '').strip()
+		resume_id = request.POST.get('resume_id', '').strip()
 
 		if not full_name or not email or not cover_letter:
 			messages.error(request, 'Please fill in your name, email, and cover letter.')
 		else:
+			resume = None
+			if resume_id:
+				try:
+					resume = Resume.objects.get(pk=resume_id, user=user)
+				except Resume.DoesNotExist:
+					messages.error(request, 'Selected resume is invalid.')
+					return redirect('apply_job', pk=job.pk)
+			
 			Application.objects.create(
 				user=user,
 				job=job,
+				resume=resume,
 				full_name=full_name,
 				email=email,
 				phone=phone,
@@ -72,6 +83,10 @@ def apply_job(request, pk):
 			)
 			messages.success(request, 'Your application has been submitted successfully.')
 			return redirect('job_detail', pk=job.pk)
+
+	# Get user's resumes for the form
+	user_resumes = Resume.objects.filter(user=user)
+	default_resume = user_resumes.filter(is_default=True).first()
 
 	# Pre-fill form with user data
 	initial_data = {
@@ -85,6 +100,8 @@ def apply_job(request, pk):
 		'existing_active_application': existing_active_application,
 		'latest_application': latest_application,
 		'can_reapply': can_reapply,
+		'user_resumes': user_resumes,
+		'default_resume': default_resume,
 	})
 
 # allows users to view their job applications with pagination and filtering by status.
