@@ -54,3 +54,6 @@ Thumbs.db
 .DS_Store
 
 requirements.txt 
+
+# Uploaded resumes/media
+resumes/
