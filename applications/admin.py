@@ -1,6 +1,11 @@
 from django.contrib import admin
 from django.utils.html import format_html
 from django.core.files.storage import default_storage
+from django.http import HttpResponse
+from django.utils import timezone
+
+import io
+import zipfile
 
 from .models import Application
 
@@ -17,6 +22,7 @@ class ApplicationAdmin(admin.ModelAdmin):
 		'mark_as_shortlisted',
 		'mark_as_rejected',
 		'mark_as_withdrawn',
+		'download_resumes',
 	)
 
 	@admin.action(description='Mark selected applications as Reviewed')
@@ -58,3 +64,35 @@ class ApplicationAdmin(admin.ModelAdmin):
 		except Exception:
 			return 'Unavailable'
 	resume_link.short_description = 'Resume'
+
+	@admin.action(description='Download resumes for selected applications')
+	def download_resumes(self, request, queryset):
+		"""Create a ZIP archive of available resumes for selected applications and return it as a response."""
+		buffer = io.BytesIO()
+		added = 0
+		with zipfile.ZipFile(buffer, 'w', zipfile.ZIP_DEFLATED) as zf:
+			for app in queryset.select_related('resume'):
+				if not app.resume or not app.resume.file:
+					continue
+				name = app.resume.file.name
+				if not name or not default_storage.exists(name):
+					continue
+				try:
+					with default_storage.open(name, 'rb') as f:
+						data = f.read()
+					filename = f"{app.full_name.replace(' ', '_')}_{app.pk}_{app.resume.file.name.split('/')[-1]}"
+					zf.writestr(filename, data)
+					added += 1
+				except Exception:
+					# skip problematic files
+					continue
+
+		if added == 0:
+			self.message_user(request, 'No resume files found for selected applications.')
+			return None
+
+		buffer.seek(0)
+		ts = timezone.now().strftime('%Y%m%d%H%M%S')
+		response = HttpResponse(buffer.getvalue(), content_type='application/zip')
+		response['Content-Disposition'] = f'attachment; filename=resumes_{ts}.zip'
+		return response
