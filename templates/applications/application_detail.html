@@ -44,6 +44,20 @@
                 <p>{{ application.cover_letter|linebreaksbr }}</p>
             </div>
 
+            {% if application.resume %}
+            <div class="application-resume">
+                <h2>Attached Resume</h2>
+                {% if resume_available and resume_url %}
+                    <p>
+                        <a href="{{ resume_url }}" target="_blank" rel="noopener noreferrer">{{ resume_filename }}</a>
+                        {% if resume_size_mb %}<small class="muted"> • {{ resume_size_mb }} MB</small>{% endif %}
+                    </p>
+                {% else %}
+                    <p class="text-danger">Resume file is not available.</p>
+                {% endif %}
+            </div>
+            {% endif %}
+
             <div class="application-actions">
                 {% if can_withdraw %}
                     <form method="post" action="{% url 'withdraw_application' application.pk %}">

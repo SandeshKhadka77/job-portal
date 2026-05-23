@@ -1,11 +1,13 @@
 from django.contrib import admin
+from django.utils.html import format_html
+from django.core.files.storage import default_storage
 
 from .models import Application
 
 
 @admin.register(Application)
 class ApplicationAdmin(admin.ModelAdmin):
-	list_display = ('full_name', 'job', 'email', 'user', 'has_resume', 'status', 'created_at')
+	list_display = ('full_name', 'job', 'email', 'user', 'resume_link', 'status', 'created_at')
 	list_filter = ('status', 'created_at', 'job__job_type', 'user')
 	search_fields = ('full_name', 'email', 'user__email', 'job__title', 'job__company_name')
 	readonly_fields = ('created_at',)
@@ -41,3 +43,18 @@ class ApplicationAdmin(admin.ModelAdmin):
 		"""Display whether application has an attached resume"""
 		return 'Yes' if obj.resume else 'No'
 	has_resume.short_description = 'Has Resume'
+
+	def resume_link(self, obj):
+		"""Show a link to the attached resume when available"""
+		if not obj.resume or not obj.resume.file:
+			return '—'
+		name = obj.resume.file.name
+		if not name or not default_storage.exists(name):
+			return 'Missing'
+		try:
+			url = obj.resume.file.url
+			filename = obj.resume.name or obj.resume.file.name.split('/')[-1]
+			return format_html('<a href="{}" target="_blank" rel="noopener noreferrer">{}</a>', url, filename)
+		except Exception:
+			return 'Unavailable'
+	resume_link.short_description = 'Resume'

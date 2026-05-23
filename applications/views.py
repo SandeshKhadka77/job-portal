@@ -6,6 +6,7 @@ from django.core.paginator import Paginator
 
 from jobs.models import Job
 from accounts.models import Resume
+from django.core.files.storage import default_storage
 
 from .models import Application
 
@@ -144,9 +145,34 @@ def application_detail(request, pk):
 		user=request.user,
 	)
 
+	# Determine whether attached resume file is available in storage
+	resume_available = False
+	resume_url = None
+	resume_filename = None
+	resume_size_mb = None
+	if application.resume and application.resume.file:
+		name = application.resume.file.name
+		if name and default_storage.exists(name):
+			resume_available = True
+			try:
+				resume_url = application.resume.file.url
+				resume_filename = application.resume.name or application.resume.file.name.split('/')[-1]
+				# Use model helper for size when possible
+				resume_size_mb = getattr(application.resume, 'get_file_size_mb', None)
+				if callable(resume_size_mb):
+					resume_size_mb = resume_size_mb()
+			except Exception:
+				# Fall back to not exposing URL/size if storage doesn't allow access
+				resume_url = None
+				resume_size_mb = None
+
 	return render(request, 'applications/application_detail.html', {
 		'application': application,
 		'can_withdraw': application.status in ACTIVE_APPLICATION_STATUSES,
+		'resume_available': resume_available,
+		'resume_url': resume_url,
+		'resume_filename': resume_filename,
+		'resume_size_mb': resume_size_mb,
 	})
 
 
