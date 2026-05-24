@@ -110,4 +110,53 @@ class ApplyFlowTests(TestCase):
         # Default resume should be pre-selected
         self.assertContains(resp, 'selected')
 
+    def test_owner_can_download_resume(self):
+        # Create a resume and application
+        resume = Resume.objects.create(
+            user=self.user,
+            file=self.create_test_file('download.pdf'),
+            name='Download Resume'
+        )
+        app = Application.objects.create(user=self.user, job=self.job, full_name='Alice', email='alice@example.com', cover_letter='Hi', resume=resume)
+
+        self.client.force_login(self.user)
+        url = reverse('download_resume', args=[app.pk])
+        resp = self.client.get(url)
+
+        self.assertEqual(resp.status_code, 200)
+        # Content type should be application/pdf
+        self.assertIn('application/pdf', resp['Content-Type'])
+
+    def test_other_user_cannot_download_resume(self):
+        other = User.objects.create_user(username='bob', email='bob@example.com', password='password')
+        resume = Resume.objects.create(
+            user=self.user,
+            file=self.create_test_file('download2.pdf'),
+            name='Download Resume 2'
+        )
+        app = Application.objects.create(user=self.user, job=self.job, full_name='Alice', email='alice@example.com', cover_letter='Hi', resume=resume)
+
+        self.client.force_login(other)
+        url = reverse('download_resume', args=[app.pk])
+        resp = self.client.get(url)
+
+        # Should redirect due to permission
+        self.assertEqual(resp.status_code, 302)
+
+    def test_admin_can_download_resume(self):
+        admin = User.objects.create_user(username='admin', email='admin@example.com', password='password', is_staff=True)
+        resume = Resume.objects.create(
+            user=self.user,
+            file=self.create_test_file('download3.pdf'),
+            name='Download Resume 3'
+        )
+        app = Application.objects.create(user=self.user, job=self.job, full_name='Alice', email='alice@example.com', cover_letter='Hi', resume=resume)
+
+        self.client.force_login(admin)
+        url = reverse('download_resume', args=[app.pk])
+        resp = self.client.get(url)
+
+        self.assertEqual(resp.status_code, 200)
+        self.assertIn('application/pdf', resp['Content-Type'])
+
 

@@ -7,4 +7,5 @@ urlpatterns = [
     path('my-applications/', views.my_applications, name='my_applications'),
     path('applications/<int:pk>/', views.application_detail, name='application_detail'),
     path('applications/<int:pk>/withdraw/', views.withdraw_application, name='withdraw_application'),
+    path('applications/<int:pk>/download/', views.download_resume, name='download_resume'),
 ]

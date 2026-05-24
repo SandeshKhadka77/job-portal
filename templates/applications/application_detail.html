@@ -47,9 +47,10 @@
             {% if application.resume %}
             <div class="application-resume">
                 <h2>Attached Resume</h2>
-                {% if resume_available and resume_url %}
+                {% if resume_available %}
                     <p>
-                        <a href="{{ resume_url }}" target="_blank" rel="noopener noreferrer">{{ resume_filename }}</a>
+                        <a href="{% url 'download_resume' application.pk %}" class="btn btn-link">Download Resume</a>
+                        {% if resume_filename %}{{ resume_filename }}{% endif %}
                         {% if resume_size_mb %}<small class="muted"> • {{ resume_size_mb }} MB</small>{% endif %}
                     </p>
                 {% else %}

@@ -7,6 +7,9 @@ from django.core.paginator import Paginator
 from jobs.models import Job
 from accounts.models import Resume
 from django.core.files.storage import default_storage
+from django.http import FileResponse, Http404
+import os
+import mimetypes
 
 from .models import Application
 
@@ -174,6 +177,47 @@ def application_detail(request, pk):
 		'resume_filename': resume_filename,
 		'resume_size_mb': resume_size_mb,
 	})
+
+
+
+@login_required(login_url='login')
+@require_http_methods(['GET'])
+def download_resume(request, pk):
+	"""Securely stream the resume attached to an application.
+
+	Only the applicant (owner) or staff users may download.
+	"""
+	application = get_object_or_404(
+		Application.objects.select_related('resume', 'user'),
+		pk=pk,
+	)
+
+	user = request.user
+	if application.user != user and not user.is_staff:
+		from django.contrib import messages
+		messages.error(request, 'You do not have permission to download this resume.')
+		return redirect('application_detail', pk=application.pk)
+
+	if not application.resume or not application.resume.file:
+		from django.contrib import messages
+		messages.error(request, 'No resume attached to this application.')
+		return redirect('application_detail', pk=application.pk)
+
+	name = application.resume.file.name
+	if not name or not default_storage.exists(name):
+		from django.contrib import messages
+		messages.error(request, 'Resume file is not available.')
+		return redirect('application_detail', pk=application.pk)
+
+	try:
+		f = default_storage.open(name, 'rb')
+		filename = application.resume.name or os.path.basename(name)
+		ctype = mimetypes.guess_type(name)[0] or 'application/octet-stream'
+		return FileResponse(f, as_attachment=True, filename=filename, content_type=ctype)
+	except Exception:
+		from django.contrib import messages
+		messages.error(request, 'Unable to download the resume at this time.')
+		return redirect('application_detail', pk=application.pk)
 
 
 @login_required(login_url='login')
