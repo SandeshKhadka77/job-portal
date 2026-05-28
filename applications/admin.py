@@ -3,6 +3,7 @@ from django.utils.html import format_html
 from django.core.files.storage import default_storage
 from django.http import HttpResponse
 from django.utils import timezone
+from .models import ResumeDownloadLog
 
 import io
 import zipfile
@@ -70,6 +71,8 @@ class ApplicationAdmin(admin.ModelAdmin):
 		"""Create a ZIP archive of available resumes for selected applications and return it as a response."""
 		buffer = io.BytesIO()
 		added = 0
+		filenames_list = []
+		total_bytes = 0
 		with zipfile.ZipFile(buffer, 'w', zipfile.ZIP_DEFLATED) as zf:
 			for app in queryset.select_related('resume'):
 				if not app.resume or not app.resume.file:
@@ -83,6 +86,8 @@ class ApplicationAdmin(admin.ModelAdmin):
 					filename = f"{app.full_name.replace(' ', '_')}_{app.pk}_{app.resume.file.name.split('/')[-1]}"
 					zf.writestr(filename, data)
 					added += 1
+					filenames_list.append(filename)
+					total_bytes += len(data)
 				except Exception:
 					# skip problematic files
 					continue
@@ -90,6 +95,21 @@ class ApplicationAdmin(admin.ModelAdmin):
 		if added == 0:
 			self.message_user(request, 'No resume files found for selected applications.')
 			return None
+
+		# record a log entry for the download
+		total_mb = round(total_bytes / (1024*1024), 2)
+		filenames = ','.join(filenames_list)
+		try:
+			ResumeDownloadLog.objects.create(
+				user=getattr(request, 'user', None),
+				applications_count=queryset.count(),
+				files_count=added,
+				total_size_mb=total_mb,
+				filenames=filenames,
+			)
+		except Exception:
+			# non-fatal: log creation failure should not break download
+			pass
 
 		buffer.seek(0)
 		ts = timezone.now().strftime('%Y%m%d%H%M%S')

@@ -1,4 +1,5 @@
 from django.db import models
+from django.conf import settings
 from django.contrib.auth.models import User
 
 from jobs.models import Job
@@ -35,3 +36,18 @@ class Application(models.Model):
 
 	def __str__(self):
 		return f'{self.full_name} - {self.job.title}'
+
+class ResumeDownloadLog(models.Model):
+    """Log of admin or staff resume bulk downloads."""
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True)
+    timestamp = models.DateTimeField(auto_now_add=True)
+    applications_count = models.PositiveIntegerField(default=0)
+    files_count = models.PositiveIntegerField(default=0)
+    total_size_mb = models.DecimalField(max_digits=8, decimal_places=2, default=0)
+    filenames = models.TextField(blank=True)
+
+    class Meta:
+        ordering = ['-timestamp']
+
+    def __str__(self):
+        return f"ResumeDownload by {self.user} at {self.timestamp} ({self.files_count} files)"
