@@ -2,10 +2,13 @@ from django.test import TestCase, Client
 from django.urls import reverse
 from django.contrib.auth.models import User
 from django.core.files.uploadedfile import SimpleUploadedFile
-
 from jobs.models import Job
 from accounts.models import Resume
 from .models import Application
+from django.test import RequestFactory, override_settings
+from django.contrib.admin.sites import AdminSite
+from .admin import ApplicationAdmin
+from django.contrib.messages.storage.fallback import FallbackStorage
 
 
 class ApplyFlowTests(TestCase):
@@ -158,5 +161,44 @@ class ApplyFlowTests(TestCase):
 
         self.assertEqual(resp.status_code, 200)
         self.assertIn('application/pdf', resp['Content-Type'])
+
+    def test_admin_download_exceeds_file_limit(self):
+        admin = User.objects.create_user(username='admin2', email='admin2@example.com', password='password', is_staff=True)
+        # create two resumes
+        resume1 = Resume.objects.create(user=self.user, file=self.create_test_file('a.pdf'), name='A')
+        resume2 = Resume.objects.create(user=self.user, file=self.create_test_file('b.pdf'), name='B')
+        app1 = Application.objects.create(user=self.user, job=self.job, full_name='A', email='a@example.com', cover_letter='x', resume=resume1)
+        app2 = Application.objects.create(user=self.user, job=self.job, full_name='B', email='b@example.com', cover_letter='x', resume=resume2)
+
+        rf = RequestFactory()
+        request = rf.post('/admin/applications/application/')
+        request.user = admin
+
+        admin_site = AdminSite()
+        admin_instance = ApplicationAdmin(Application, admin_site)
+        # avoid messages middleware requirement in tests
+        admin_instance.message_user = lambda *a, **k: None
+        with override_settings(RESUME_DOWNLOAD_MAX_FILES=1):
+            result = admin_instance.download_resumes(request, Application.objects.filter(pk__in=[app1.pk, app2.pk]))
+            self.assertIsNone(result)
+
+    def test_admin_download_exceeds_size_limit(self):
+        admin = User.objects.create_user(username='admin3', email='admin3@example.com', password='password', is_staff=True)
+        # create one large resume (> limit)
+        large_content = b'a' * 2048  # 2 KB
+        resume = Resume.objects.create(user=self.user, file=SimpleUploadedFile('large.pdf', large_content, content_type='application/pdf'), name='Large')
+        app = Application.objects.create(user=self.user, job=self.job, full_name='Large', email='l@example.com', cover_letter='x', resume=resume)
+
+        rf = RequestFactory()
+        request = rf.post('/admin/applications/application/')
+        request.user = admin
+
+        admin_site = AdminSite()
+        admin_instance = ApplicationAdmin(Application, admin_site)
+        admin_instance.message_user = lambda *a, **k: None
+        # set tiny limit to trigger size exceeded
+        with override_settings(RESUME_DOWNLOAD_MAX_TOTAL_MB=0.00001):
+            result = admin_instance.download_resumes(request, Application.objects.filter(pk=app.pk))
+            self.assertIsNone(result)
 
 

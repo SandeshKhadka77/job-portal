@@ -70,31 +70,43 @@ class ApplicationAdmin(admin.ModelAdmin):
 	def download_resumes(self, request, queryset):
 		"""Create a ZIP archive of available resumes for selected applications and return it as a response."""
 		buffer = io.BytesIO()
-		added = 0
+		entries = []
 		filenames_list = []
 		total_bytes = 0
-		with zipfile.ZipFile(buffer, 'w', zipfile.ZIP_DEFLATED) as zf:
-			for app in queryset.select_related('resume'):
-				if not app.resume or not app.resume.file:
-					continue
-				name = app.resume.file.name
-				if not name or not default_storage.exists(name):
-					continue
-				try:
-					with default_storage.open(name, 'rb') as f:
-						data = f.read()
-					filename = f"{app.full_name.replace(' ', '_')}_{app.pk}_{app.resume.file.name.split('/')[-1]}"
-					zf.writestr(filename, data)
-					added += 1
-					filenames_list.append(filename)
-					total_bytes += len(data)
-				except Exception:
-					# skip problematic files
-					continue
+		for app in queryset.select_related('resume'):
+			if not app.resume or not app.resume.file:
+				continue
+			name = app.resume.file.name
+			if not name or not default_storage.exists(name):
+				continue
+			try:
+				with default_storage.open(name, 'rb') as f:
+					data = f.read()
+				filename = f"{app.full_name.replace(' ', '_')}_{app.pk}_{app.resume.file.name.split('/')[-1]}"
+				entries.append((filename, data))
+				filenames_list.append(filename)
+				total_bytes += len(data)
+			except Exception:
+				continue
 
-		if added == 0:
+		# enforce configurable limits before creating the ZIP
+		max_files = getattr(__import__('django.conf').conf.settings, 'RESUME_DOWNLOAD_MAX_FILES', 50)
+		max_total_mb = getattr(__import__('django.conf').conf.settings, 'RESUME_DOWNLOAD_MAX_TOTAL_MB', 100)
+		if len(entries) == 0:
 			self.message_user(request, 'No resume files found for selected applications.')
 			return None
+		if len(entries) > max_files:
+			self.message_user(request, f'Cannot download {len(entries)} files — limit is {max_files} files per download.')
+			return None
+		if total_bytes > (max_total_mb * 1024 * 1024):
+			self.message_user(request, f'Total resumes size {round(total_bytes/(1024*1024),2)} MB exceeds the allowed {max_total_mb} MB.')
+			return None
+
+		added = 0
+		with zipfile.ZipFile(buffer, 'w', zipfile.ZIP_DEFLATED) as zf:
+			for filename, data in entries:
+				zf.writestr(filename, data)
+				added += 1
 
 		# record a log entry for the download
 		total_mb = round(total_bytes / (1024*1024), 2)
